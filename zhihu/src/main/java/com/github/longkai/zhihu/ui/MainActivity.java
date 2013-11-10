@@ -1,7 +1,6 @@
 package com.github.longkai.zhihu.ui;
 
 import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,9 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.longkai.zhihu.R;
-import com.github.longkai.zhihu.provider.ZhihuProvider;
 import com.github.longkai.zhihu.util.BeanUtils;
-import com.github.longkai.zhihu.util.Constants;
 import org.json.JSONArray;
 
 import java.util.Locale;
@@ -121,7 +118,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 				    BeanUtils.persist(MainActivity.this, response);
 			    }
 		    }, null));
-			getContentResolver().query(Uri.parse(ZhihuProvider.BASE_URI + Constants.USERS), null, null, null, null);
 		    return true;
 	    }
 	    return super.onOptionsItemSelected(item);

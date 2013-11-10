@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.util.Log;
 import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.util.Constants;
@@ -44,7 +45,6 @@ public class ZhihuProvider extends ContentProvider {
 	public static final int TOPICS = 6;
 	public static final int TOPIC = 7;
 	public static final int VOTERS = 8; // array, no single
-	public static final int QUESTION_TOPICS = 9; // array, no single
 
 	static {
 		matcher.addURI(AUTHORITY, Constants.USERS, USERS);
@@ -60,8 +60,6 @@ public class ZhihuProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, Constants.TOPICS + "/#", TOPIC);
 
 		matcher.addURI(AUTHORITY, Constants.VOTERS, VOTERS);
-
-		matcher.addURI(AUTHORITY, Constants.QUESTION_TOPICS + "/#", QUESTION_TOPICS);
 	}
 
 	private ZhihuData mData;
@@ -74,14 +72,46 @@ public class ZhihuProvider extends ContentProvider {
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+		SQLiteDatabase db = mData.getReadableDatabase();
+		Cursor cursor;
 		switch (matcher.match(uri)) {
 			case USERS:
-				SQLiteDatabase db = mData.getReadableDatabase();
+				cursor = db.query(Constants.USERS, projection, selection, selectionArgs, null, null, sortOrder);
+				break;
+			case USER:
+				selection = BaseColumns._ID + "='" + uri.getLastPathSegment() + "'";
+				cursor = db.query(Constants.USERS, projection, selection, null, null, null, null);
+				break;
+			case ANSWERS:
+				cursor = db.query(Constants.ANSWERS, projection, selection, selectionArgs, null, null, sortOrder);
+				break;
+			case ANSWER:
+				selection = BaseColumns._ID + "=" + uri.getLastPathSegment();
+				cursor = db.query(Constants.ANSWERS, projection, selection, null, null, null, null);
+				break;
+			case QUESTIONS:
+				cursor = db.query(Constants.QUESTIONS, projection, selection, selectionArgs, null, null, sortOrder);
+				break;
+			case QUESTION:
+				selection = BaseColumns._ID + "=" + uri.getLastPathSegment();
+				cursor = db.query(Constants.QUESTIONS, projection, selection, null, null, null, null);
+				break;
+			case TOPICS:
+				cursor = db.query(Constants.TOPICS, projection, selection, selectionArgs, null, null, sortOrder);
+				break;
+			case TOPIC:
+				selection = BaseColumns._ID + "=" + uri.getLastPathSegment();
+				cursor = db.query(Constants.TOPICS, projection, selection, null, null, null, null);
+				break;
+			case VOTERS:
+				cursor = db.query(Constants.VOTERS, projection, selection, selectionArgs, null, null, sortOrder);
 				break;
 			default:
 				throw new RuntimeException("not found for the uri: " + uri);
 		}
-		return null;
+
+		cursor.setNotificationUri(getContext().getContentResolver(), uri);
+		return cursor;
 	}
 
 	@Override
@@ -115,9 +145,6 @@ public class ZhihuProvider extends ContentProvider {
 			case VOTERS:
 				type = MULTIPLE_RECORDS_MIME_TYPE + Constants.VOTERS;
 				break;
-			case QUESTION_TOPICS:
-				type = MULTIPLE_RECORDS_MIME_TYPE + Constants.QUESTION_TOPICS;
-				break;
 			default:
 				throw new RuntimeException("not found for the uri: " + uri);
 		}
@@ -125,18 +152,54 @@ public class ZhihuProvider extends ContentProvider {
 	}
 
 	@Override
+	public int bulkInsert(Uri uri, ContentValues[] values) {
+		String table;
+		switch (matcher.match(uri)) {
+			case USERS:
+				table = Constants.USERS;
+				break;
+			case ANSWERS:
+				table = Constants.ANSWERS;
+				break;
+			case QUESTIONS:
+				table = Constants.QUESTIONS;
+				break;
+			case TOPICS:
+				table = Constants.TOPICS;
+				break;
+			case VOTERS:
+				table = Constants.VOTERS;
+				break;
+			default:
+				throw new RuntimeException("not found for the uri: " + uri);
+		}
+		SQLiteDatabase db = mData.getWritableDatabase();
+		db.beginTransaction();
+
+		for (int i = 0; i < values.length; i++) {
+			db.insertWithOnConflict(table, null, values[i], SQLiteDatabase.CONFLICT_REPLACE); // replace the old one...
+		}
+
+		db.setTransactionSuccessful();
+		db.endTransaction();
+
+		getContext().getContentResolver().notifyChange(uri, null, false); // no sync adapter here = =
+		return values.length;
+	}
+
+	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		return null;
+		throw new UnsupportedOperationException("UnsupportedOperationException");
 	}
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		return 0;
+		throw new UnsupportedOperationException("UnsupportedOperationException");
 	}
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-		return 0;
+		throw new UnsupportedOperationException("UnsupportedOperationException");
 	}
 
 	private class ZhihuData extends SQLiteOpenHelper {
@@ -153,7 +216,6 @@ public class ZhihuProvider extends ContentProvider {
 			db.execSQL(getContext().getString(R.string.table_topics));
 			db.execSQL(getContext().getString(R.string.table_voters));
 			db.execSQL(getContext().getString(R.string.table_questions));
-			db.execSQL(getContext().getString(R.string.table_questions_topics));
 			db.execSQL(getContext().getString(R.string.table_answers));
 			Log.d(TAG, "end creating tables...");
 		}

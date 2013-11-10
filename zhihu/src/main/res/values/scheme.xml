@@ -47,17 +47,20 @@
 			starred integer,
 			answered integer,
 			viewed integer,
-		    long1 integer
+		    long1 integer,
+			topics text
 		);
 	</string>
 
 	<!--question and topic one2many-->
+<!--
 	<string name="table_questions_topics">
 		CREATE TABLE question_topics(
 			qid integer NOT NULL,
 			tid integer NOT NULL
 		);
 	</string>
+-->
 
 	<string name="table_answers">
 		CREATE TABLE answers(
@@ -67,7 +70,8 @@
 			vote integer,
 			last_alter_date integer,
 			qid integer NOT NULL,
-			uid text NOT NULL
+			uid text NOT NULL,
+			long1 integer
 		 );
 	</string>
 

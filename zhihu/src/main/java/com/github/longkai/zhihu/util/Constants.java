@@ -5,6 +5,9 @@
  */
 package com.github.longkai.zhihu.util;
 
+import android.net.Uri;
+import com.github.longkai.zhihu.provider.ZhihuProvider;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -20,5 +23,9 @@ public class Constants {
 	public static final String TOPICS = "topics";
 	public static final String VOTERS = "voters";
 	public static final String QUESTION_TOPICS = "question_topics";
+
+	public static Uri parseUri(String path) {
+		return Uri.parse(ZhihuProvider.BASE_URI + path);
+	}
 
 }

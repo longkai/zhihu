@@ -5,13 +5,16 @@
  */
 package com.github.longkai.zhihu.util;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.provider.BaseColumns;
 import android.widget.Toast;
 import com.github.longkai.zhihu.bean.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -37,6 +40,14 @@ public class BeanUtils {
 		return voter;
 	}
 
+	public static ContentValues toContentValues(Voter voter) {
+		ContentValues values = new ContentValues(3);
+		values.put(BaseColumns._ID, voter.id);
+		values.put("nick", voter.nick);
+		values.put("answer_id", voter.answer_id);
+		return values;
+	}
+
 	public static Topic toTopic(JSONArray jsonArray) {
 		Topic topic = new Topic();
 		try {
@@ -49,6 +60,16 @@ public class BeanUtils {
 			throw new RuntimeException("error when deserializing topic!", e);
 		}
 		return topic;
+	}
+
+	public static ContentValues toContentValues(Topic topic) {
+		ContentValues values = new ContentValues(5);
+		values.put(BaseColumns._ID, topic.id);
+		values.put("long1", topic.long1);
+		values.put("name", topic.name);
+		values.put("description", topic.description);
+		values.put("avatar", topic.avatar);
+		return values;
 	}
 
 	public static Question toQuestion(JSONArray jsonArray) {
@@ -69,6 +90,28 @@ public class BeanUtils {
 		return question;
 	}
 
+	public static ContentValues toContentValues(Question question) {
+		ContentValues values = new ContentValues(7);
+		values.put(BaseColumns._ID, question.id);
+		values.put("title", question.title);
+		values.put("description", question.description);
+		values.put("starred", question.starred);
+		values.put("answered", question.answered);
+		values.put("viewed", question.viewed);
+
+		// use jsonarray string to store the topics belong to
+		String topics = "[";
+		for (int i = 0; i < question.topics.length; i++) {
+			topics += question.topics[i].id;
+			if (i != question.topics.length - 1) {
+				topics += ",";
+			}
+		}
+		values.put("topics", topics + "]");
+
+		return values;
+	}
+
 	public static User toUser(JSONArray jsonArray) {
 		User user = new User();
 		try {
@@ -80,6 +123,15 @@ public class BeanUtils {
 			throw new RuntimeException("error when deserializing user!", e);
 		}
 		return user;
+	}
+
+	public static ContentValues toContentValues(User user) {
+		ContentValues values = new ContentValues(4);
+		values.put(BaseColumns._ID, user.id);
+		values.put("nick", user.nick);
+		values.put("avatar", user.avatar);
+		values.put("hash", user.hash);
+		return values;
 	}
 
 	public static Answer toAnswer(JSONArray jsonArray) {
@@ -97,6 +149,19 @@ public class BeanUtils {
 			throw new RuntimeException("error when deserializing answer!", e);
 		}
 		return answer;
+	}
+
+	public static ContentValues toContentValues(Answer answer) {
+		ContentValues values = new ContentValues(8);
+		values.put(BaseColumns._ID, answer.id);
+		values.put("long1", answer.long1);
+		values.put("status", answer.status);
+		values.put("answer", answer.answer);
+		values.put("vote", answer.vote);
+		values.put("last_alter_date", answer.last_alter_date);
+		values.put("qid", answer.question.id);
+		values.put("uid", answer.user.id);
+		return values;
 	}
 
 	public static void persist(Context context, JSONArray data) {
@@ -140,11 +205,45 @@ public class BeanUtils {
 			throw new RuntimeException(e);
 		}
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < questions.length; i++) {
-			sb.append(i + 1).append(": ").append(questions[i].title).append("\n");
+		// now persist in to local databases = =
+		ContentValues[] valueses = new ContentValues[answers.length];
+		for (int i = 0; i < answers.length; i++) {
+			valueses[i] = toContentValues(answers[i]);
 		}
-		Toast.makeText(context, sb, Toast.LENGTH_LONG).show();
+		context.getContentResolver().bulkInsert(Constants.parseUri(Constants.ANSWERS), valueses);
+
+		for (int i = 0; i < questions.length; i++) {
+			// duplicate will be replace
+			valueses[i].clear();
+			valueses[i] = toContentValues(questions[i]);
+		}
+		context.getContentResolver().bulkInsert(Constants.parseUri(Constants.QUESTIONS), valueses);
+
+		for (int i = 0; i < users.length; i++) {
+			valueses[i].clear();
+			valueses[i] = toContentValues(users[i]);
+		}
+		context.getContentResolver().bulkInsert(Constants.parseUri(Constants.USERS), valueses);
+
+		valueses = new ContentValues[topics.size()];
+		int i = 0;
+		for (Topic t : topics) {
+			valueses[i] = toContentValues(t);
+			i++;
+		}
+		context.getContentResolver().bulkInsert(Constants.parseUri(Constants.TOPICS), valueses);
+
+		valueses = new ContentValues[voters.size()];
+		Iterator<Voter> it = voters.iterator();
+		i = 0;
+		while (it.hasNext()) {
+			Voter voter = it.next();
+			valueses[i] = toContentValues(voter);
+			i++;
+		}
+		context.getContentResolver().bulkInsert(Constants.parseUri(Constants.VOTERS), valueses);
+
+		Toast.makeText(context, valueses[0].toString(), Toast.LENGTH_LONG).show();
 	}
 
 }

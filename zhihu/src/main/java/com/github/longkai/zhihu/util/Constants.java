@@ -14,5 +14,11 @@ package com.github.longkai.zhihu.util;
  */
 public class Constants {
 
+	public static final String USERS = "users";
+	public static final String ANSWERS = "answers";
+	public static final String QUESTIONS = "questions";
+	public static final String TOPICS = "topics";
+	public static final String VOTERS = "voters";
+	public static final String QUESTION_TOPICS = "question_topics";
 
 }

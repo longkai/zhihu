@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2013 longkai(龙凯)
+  ~ The software shall be used for good, not evil.
+  -->
+
+<resources>
+
+	<string name="db_name">zhihu.db</string>
+	<integer name="db_version">1</integer>
+
+	<string name="table_users">
+		<!--USE TEXT AS THE PRIMAY KEY TYPE-->
+		CREATE TABLE users(
+			_id text PRIMARY KEY,
+			nick text NOT NULL,
+			avatar text,
+			hash text
+		);
+	</string>
+
+	<string name="table_topics">
+		CREATE TABLE topics(
+			_id integer PRIMARY KEY,
+			name text NOT NULL,
+			description text,
+			avatar text,
+			long1 integer
+		);
+	</string>
+
+	<string name="table_voters">
+		<!--NO PRIMARY KEY-->
+		CREATE TABLE voters(
+			_id text,
+			nick text NOT NULL,
+			answer_id integer NOT NULL
+		);
+	</string>
+
+	<string name="table_questions">
+		CREATE TABLE questions(
+			_id integer PRIMARY KEY,
+			title text NOT NULL,
+			description text,
+			starred integer,
+			answered integer,
+			viewed integer,
+		    long1 integer
+		);
+	</string>
+
+	<!--question and topic one2many-->
+	<string name="table_questions_topics">
+		CREATE TABLE question_topics(
+			qid integer NOT NULL,
+			tid integer NOT NULL
+		);
+	</string>
+
+	<string name="table_answers">
+		CREATE TABLE answers(
+			_id integer PRIMARY KEY,
+			status text,
+			answer text,
+			vote integer,
+			last_alter_date integer,
+			qid integer NOT NULL,
+			uid text NOT NULL
+		 );
+	</string>
+
+	<string name="drop_all_table">
+		DROP TABLE IF EXISTS users;
+		DROP TABLE IF EXISTS topics;
+		DROP TABLE IF EXISTS voters;
+		DROP TABLE IF EXISTS questions;
+		DROP TABLE IF EXISTS question_topics;
+	</string>
+</resources>

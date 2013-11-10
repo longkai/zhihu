@@ -24,6 +24,10 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+
+		<provider
+			android:authorities="com.github.longkai.zhihu.provider"
+			android:name=".provider.ZhihuProvider" />
 	</application>
 
 </manifest>

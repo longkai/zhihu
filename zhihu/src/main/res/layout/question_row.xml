@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2013 longkai(龙凯)
+  ~ The software shall be used for good, not evil.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:padding="@dimen/default_margin"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<ImageView
+		android:id="@+id/nice"
+		android:paddingLeft="@dimen/default_padding"
+		android:paddingRight="@dimen/default_padding"
+		android:layout_alignTop="@android:id/title"
+		android:layout_alignBottom="@+id/topics"
+		android:src="@drawable/rating_not_important_light"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@android:id/title"
+		android:text="@string/action_quit"
+		android:textAppearance="@android:style/TextAppearance.Large"
+		android:textColor="@color/text"
+		android:layout_toRightOf="@id/nice"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+<!--
+	<TextView
+		android:id="@+id/desc"
+		android:layout_toRightOf="@id/nice"
+		android:text="@string/action_quit"
+		android:layout_below="@id/title"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+-->
+
+	<TextView
+		android:id="@id/topics"
+		android:layout_below="@android:id/title"
+		android:layout_alignParentRight="true"
+		android:background="@color/holo_orange_light"
+		android:paddingRight="5dp"
+		android:paddingLeft="5dp"
+		android:text="娱乐"
+		android:textColor="@color/text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+</RelativeLayout>

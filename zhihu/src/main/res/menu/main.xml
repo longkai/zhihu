@@ -6,4 +6,10 @@
 		android:title="@string/action_quit"
 		app:showAsAction="never" />
 
+	<item
+		android:id="@+id/refresh"
+		android:title="@string/refresh"
+		android:icon="@drawable/navigation_refresh_light"
+		app:showAsAction="always" />
+
 </menu>

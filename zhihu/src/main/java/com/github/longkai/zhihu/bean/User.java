@@ -20,6 +20,9 @@ public class User implements Parcelable {
 	/** 用户昵称 */
 	public String nick;
 
+	/** 状态 */
+	public String status;
+
 	/** 用户id */
 	public String id;
 
@@ -37,6 +40,7 @@ public class User implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(nick);
+		dest.writeString(status);
 		dest.writeString(id);
 		dest.writeString(avatar);
 		dest.writeString(hash);
@@ -47,6 +51,7 @@ public class User implements Parcelable {
 		public User createFromParcel(Parcel source) {
 			User user = new User();
 			user.id = source.readString();
+			user.status = source.readString();
 			user.avatar = source.readString();
 			user.hash = source.readString();
 			return user;

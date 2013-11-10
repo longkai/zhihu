@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.provider.BaseColumns;
 import android.widget.Toast;
+import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.bean.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -100,14 +101,22 @@ public class BeanUtils {
 		values.put("viewed", question.viewed);
 
 		// use jsonarray string to store the topics belong to
-		String topics = "[";
+//		String topics = "[";
+//		for (int i = 0; i < question.topics.length; i++) {
+//			topics += question.topics[i].id;
+//			if (i != question.topics.length - 1) {
+//				topics += ",";
+//			}
+//		}
+		String topics = "";
 		for (int i = 0; i < question.topics.length; i++) {
-			topics += question.topics[i].id;
+			topics += question.topics[i].name;
 			if (i != question.topics.length - 1) {
-				topics += ",";
+				topics += "|";
 			}
 		}
-		values.put("topics", topics + "]");
+//		values.put("topics", topics + "]");
+		values.put("topics", topics);
 
 		return values;
 	}
@@ -131,6 +140,7 @@ public class BeanUtils {
 		values.put("nick", user.nick);
 		values.put("avatar", user.avatar);
 		values.put("hash", user.hash);
+		values.put("status", user.status);
 		return values;
 	}
 
@@ -181,6 +191,7 @@ public class BeanUtils {
 
 				answers[i] = toAnswer(entry);
 				users[i] = toUser(entry.getJSONArray(6));
+				users[i].status = answers[i].status;
 				questions[i] = toQuestion(entry.getJSONArray(7));
 
 				JSONArray topicArray = entry.getJSONArray(7).getJSONArray(7);
@@ -245,7 +256,7 @@ public class BeanUtils {
 		}
 		context.getContentResolver().bulkInsert(Constants.parseUri(Constants.VOTERS), valueses);
 
-		Toast.makeText(context, valueses[0].toString(), Toast.LENGTH_LONG).show();
+		Toast.makeText(context, context.getString(R.string.load_complete), Toast.LENGTH_LONG).show();
 	}
 
 }

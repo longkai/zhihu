@@ -12,7 +12,15 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.github.longkai.zhihu.R;
+import com.github.longkai.zhihu.ZhihuApp;
+import com.github.longkai.zhihu.util.BeanUtils;
+import com.github.longkai.zhihu.util.Constants;
+import org.json.JSONArray;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
@@ -65,6 +73,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 			    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			    startActivity(i);
 			    break;
+		    case R.id.refresh:
+			    ZhihuApp.getRequestQueue().add(new JsonArrayRequest(Constants.url(1), new Response.Listener<JSONArray>() {
+				    @Override
+				    public void onResponse(JSONArray response) {
+					    BeanUtils.persist(MainActivity.this, response);
+				    }
+			    }, new Response.ErrorListener() {
+				    @Override
+				    public void onErrorResponse(VolleyError error) {
+					    Toast.makeText(MainActivity.this,
+							    getString(R.string.load_data_error, error.getLocalizedMessage()),
+							        Toast.LENGTH_SHORT).show();
+				    }
+			    }));
+			    break;
 		    default:
 			    Log.e(TAG, "no this option!");
 			    break;
@@ -97,9 +120,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 			super(fm);
 			this.titles = titles;
 			fragments = new Fragment[titles.length];
-			for (int i = 0; i < fragments.length; i++) {
-				fragments[i] = new HotAnswerFragment();
-			}
+			fragments[0] = new HotItemsFragment();
+			fragments[1] = new UsersFragment();
 		}
 
 		@Override

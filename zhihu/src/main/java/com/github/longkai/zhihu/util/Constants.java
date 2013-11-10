@@ -28,4 +28,8 @@ public class Constants {
 		return Uri.parse(ZhihuProvider.BASE_URI + path);
 	}
 
+	public static String url(int page) {
+		return "http://www.zhihu.com/reader/json/" + page + "?r=" + System.currentTimeMillis();
+	}
+
 }

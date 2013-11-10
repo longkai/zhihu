@@ -41,8 +41,8 @@ public class Answer implements Parcelable {
 	/** 回答者 */
 	public User user;
 
-	/** 投票者 */
-	public Voter[] voters;
+//	/** 投票者 */
+//	public Voter[] voters;
 
 
 	@Override
@@ -63,8 +63,8 @@ public class Answer implements Parcelable {
 		dest.writeParcelable(user, flags);
 
 		// write array' s length first
-		dest.writeInt(voters.length);
-		dest.writeTypedArray(voters, flags);
+//		dest.writeInt(voters.length);
+//		dest.writeTypedArray(voters, flags);
 	}
 
 	public static final Creator<Answer> CREATOR = new Creator<Answer>() {
@@ -82,9 +82,9 @@ public class Answer implements Parcelable {
 			answer.user = source.readParcelable(null);
 
 			// read the array' s length first
-			int length = source.readInt();
-			answer.voters = Voter.CREATOR.newArray(length);
-			source.readTypedArray(answer.voters, Voter.CREATOR);
+//			int length = source.readInt();
+//			answer.voters = Voter.CREATOR.newArray(length);
+//			source.readTypedArray(answer.voters, Voter.CREATOR);
 			return answer;
 		}
 
@@ -94,4 +94,20 @@ public class Answer implements Parcelable {
 		}
 	};
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Answer)) return false;
+
+		Answer answer = (Answer) o;
+
+		if (id != answer.id) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) (id ^ (id >>> 32));
+	}
 }

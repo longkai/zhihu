@@ -85,4 +85,21 @@ public class Question implements Parcelable {
 			return new Question[size];
 		}
 	};
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Question)) return false;
+
+		Question question = (Question) o;
+
+		if (id != question.id) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) (id ^ (id >>> 32));
+	}
 }

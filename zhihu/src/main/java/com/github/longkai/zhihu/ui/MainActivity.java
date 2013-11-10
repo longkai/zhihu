@@ -1,6 +1,5 @@
 package com.github.longkai.zhihu.ui;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,13 +10,14 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.*;
-import android.webkit.WebView;
 import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.longkai.zhihu.R;
+import com.github.longkai.zhihu.util.BeanUtils;
+import org.json.JSONArray;
 
 import java.util.Locale;
 
@@ -98,17 +98,24 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         int id = item.getItemId();
 	    if (id == R.id.action_settings) {
 	        final ProgressDialog progressDialog = ProgressDialog.show(this, "loading...", "please wait......");
-		    mQueue.add(new StringRequest("http://www.zhihu.com", new Response.Listener<String>() {
+//		    mQueue.add(new StringRequest("http://www.zhihu.com", new Response.Listener<String>() {
+//			    @Override
+//			    public void onResponse(String response) {
+//				    final WebView webView = new WebView(MainActivity.this);
+//				    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//				    webView.setLayoutParams(params);
+//				    webView.loadDataWithBaseURL(null, response, "text/html", "utf-8", null);
+//				    progressDialog.dismiss();
+//				    new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle(R.string.app_name).setView(webView)
+//						    .setNeutralButton(android.R.string.ok, null).show();
+////				    Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
+//			    }
+//		    }, null));
+		    mQueue.add(new JsonArrayRequest("http://www.zhihu.com/reader/json/1", new Response.Listener<JSONArray>() {
 			    @Override
-			    public void onResponse(String response) {
-				    final WebView webView = new WebView(MainActivity.this);
-				    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-				    webView.setLayoutParams(params);
-				    webView.loadDataWithBaseURL(null, response, "text/html", "utf-8", null);
+			    public void onResponse(JSONArray response) {
 				    progressDialog.dismiss();
-				    new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle(R.string.app_name).setView(webView)
-						    .setNeutralButton(android.R.string.ok, null).show();
-//				    Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
+				    BeanUtils.persist(MainActivity.this, response);
 			    }
 		    }, null));
 		    return true;

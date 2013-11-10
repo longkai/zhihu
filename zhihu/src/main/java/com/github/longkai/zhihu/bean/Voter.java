@@ -21,6 +21,8 @@ public class Voter implements Parcelable {
 
 	public String id;
 
+	public long answer_id;
+
 	@Override
 	public int describeContents() {
 		return 0;
@@ -30,6 +32,7 @@ public class Voter implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(nick);
 		dest.writeString(id);
+		dest.writeLong(answer_id);
 	}
 
 	public static final Creator<Voter> CREATOR = new Creator<Voter>() {
@@ -38,6 +41,7 @@ public class Voter implements Parcelable {
 			Voter voter = new Voter();
 			voter.nick = source.readString();
 			voter.id = source.readString();
+			voter.answer_id = source.readLong();
 			return voter;
 		}
 
@@ -46,4 +50,21 @@ public class Voter implements Parcelable {
 			return new Voter[size];
 		}
 	};
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Voter)) return false;
+
+		Voter voter = (Voter) o;
+
+		if (id != null ? !id.equals(voter.id) : voter.id != null) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
+	}
 }

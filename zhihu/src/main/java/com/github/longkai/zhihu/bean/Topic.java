@@ -63,4 +63,21 @@ public class Topic implements Parcelable {
 			return new Topic[size];
 		}
 	};
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Topic)) return false;
+
+		Topic topic = (Topic) o;
+
+		if (id != topic.id) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) (id ^ (id >>> 32));
+	}
 }

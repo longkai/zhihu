@@ -192,7 +192,9 @@ public class BeanUtils {
 
 				JSONArray voterArray = entry.getJSONArray(8);
 				for (int j = 0; j < voterArray.length(); j++) {
-					voters.add(toVoter(voterArray.getJSONArray(j)));
+					Voter voter = toVoter(voterArray.getJSONArray(j));
+					voter.answer_id = answers[i].id;
+					voters.add(voter);
 				}
 
 				// deal with relationships

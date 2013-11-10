@@ -1,5 +1,6 @@
 package com.github.longkai.zhihu.ui;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,20 +11,19 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.*;
+import android.widget.ImageView;
 import android.widget.TextView;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
 import com.github.longkai.zhihu.R;
+import com.github.longkai.zhihu.ZhihuApp;
 import com.github.longkai.zhihu.util.BeanUtils;
 import org.json.JSONArray;
 
 import java.util.Locale;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
-
-	private RequestQueue mQueue;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -44,8 +44,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(com.github.longkai.android.R.layout.pager);
-
-	    mQueue = Volley.newRequestQueue(this);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -111,13 +109,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 ////				    Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
 //			    }
 //		    }, null));
-		    mQueue.add(new JsonArrayRequest("http://www.zhihu.com/reader/json/1", new Response.Listener<JSONArray>() {
+		    ZhihuApp.getRequestQueue().add(new JsonArrayRequest("http://www.zhihu.com/reader/json/1", new Response.Listener<JSONArray>() {
 			    @Override
 			    public void onResponse(JSONArray response) {
 				    progressDialog.dismiss();
 				    BeanUtils.persist(MainActivity.this, response);
 			    }
 		    }, null));
+		    ImageView imageView = new ImageView(this);
+		    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		    imageView.setLayoutParams(params);
+		    ZhihuApp.getImageLoader().get("https://www.google.com.hk/images/srpr/logo11w.png", ImageLoader.getImageListener(imageView, R.drawable.ic_launcher, R.drawable.ic_drawer));
+		    new AlertDialog.Builder(this).setView(imageView).setNeutralButton(android.R.string.ok, null).show();
 		    return true;
 	    }
 	    return super.onOptionsItemSelected(item);

@@ -15,7 +15,7 @@ import com.android.volley.toolbox.Volley;
 import com.github.longkai.zhihu.util.BitmapLruCache;
 
 /**
- * Created with IntelliJ IDEA.
+ * 知乎阅读应用程序对象.
  *
  * @User longkai
  * @Date 13-11-10
@@ -37,7 +37,7 @@ public class ZhihuApp extends Application implements SharedPreferences.OnSharedP
 		super.onCreate();
 		sApp = this;
 		sQueue = Volley.newRequestQueue(this);
-		// todo make the cache' s size available
+		// todo makes the cache' s size available
 		sLoader = new ImageLoader(sQueue, new BitmapLruCache(100)); // 100 cache entries
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 	}

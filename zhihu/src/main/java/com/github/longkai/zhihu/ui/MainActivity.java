@@ -1,25 +1,29 @@
 package com.github.longkai.zhihu.ui;
 
-import java.util.Locale;
-
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.*;
+import android.webkit.WebView;
 import android.widget.TextView;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.github.longkai.zhihu.R;
 
+import java.util.Locale;
+
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
+
+	private RequestQueue mQueue;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -39,7 +43,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(com.github.longkai.android.R.layout.pager);
+
+	    mQueue = Volley.newRequestQueue(this);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -79,10 +85,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+	    // Inflate the menu; this adds items to the action bar if it is present.
+	    getMenuInflater().inflate(R.menu.main, menu);
+	    return true;
     }
 
     @Override
@@ -91,10 +96,24 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+	    if (id == R.id.action_settings) {
+	        final ProgressDialog progressDialog = ProgressDialog.show(this, "loading...", "please wait......");
+		    mQueue.add(new StringRequest("http://www.zhihu.com", new Response.Listener<String>() {
+			    @Override
+			    public void onResponse(String response) {
+				    final WebView webView = new WebView(MainActivity.this);
+				    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+				    webView.setLayoutParams(params);
+				    webView.loadDataWithBaseURL(null, response, "text/html", "utf-8", null);
+				    progressDialog.dismiss();
+				    new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle(R.string.app_name).setView(webView)
+						    .setNeutralButton(android.R.string.ok, null).show();
+//				    Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
+			    }
+		    }, null));
+		    return true;
+	    }
+	    return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -178,10 +197,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
+	        TextView tv = new TextView(getActivity());
+	        tv.setTextColor(getResources().getColor(com.github.longkai.android.R.color.holo_orange_light));
+	        tv.setBackgroundColor(getResources().getColor(com.github.longkai.android.R.color.holo_purple_light));
+	        tv.setText(R.string.app_name);
+	        return tv;
         }
     }
 

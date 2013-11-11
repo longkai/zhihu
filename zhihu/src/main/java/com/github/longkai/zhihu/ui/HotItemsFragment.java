@@ -127,8 +127,8 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 			ViewHolder holder = new ViewHolder();
 			holder.title = (TextView) view.findViewById(android.R.id.title);
 			holder.titleIndex = cursor.getColumnIndex("title");
-			holder.topics = (TextView) view.findViewById(R.id.topics);
-			holder.topicsIndex = cursor.getColumnIndex("topics");
+			holder.viewed = (TextView) view.findViewById(R.id.viewed);
+			holder.viewedIndex = cursor.getColumnIndex("viewed");
 //			holder.desc = (TextView) view.findViewById(R.id.desc);
 //			holder.descIndex = cursor.getColumnIndex("description");
 
@@ -144,8 +144,8 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 			holder.title.setText(cursor.getString(holder.titleIndex));
 //			String desc = cursor.getString(holder.descIndex);
 //			holder.desc.setText(desc.length() > 30 ? desc.substring(0, 30) : desc);
-			holder.topics.setText(cursor.getString(holder.topicsIndex));
-			holder.nice.setImageResource(R.drawable.rating_not_important_light);
+			holder.viewed.setText(cursor.getString(holder.viewedIndex));
+//			holder.nice.setImageResource(R.drawable.rating_not_important_light);
 		}
 
 		private static class ViewHolder {
@@ -154,8 +154,8 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 			ImageView nice;
 
-			TextView topics;
-			int topicsIndex;
+			TextView viewed;
+			int viewedIndex;
 
 //			TextView desc;
 //			int descIndex;

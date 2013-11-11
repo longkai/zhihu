@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2013 longkai(龙凯)
+  ~ The software shall be used for good, not evil.
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<item
+		android:id="@+id/author"
+		android:icon="@drawable/social_person_light"
+		app:showAsAction="always" />
+
+	<item
+		android:id="@+id/share"
+		android:icon="@drawable/social_share_light"
+		android:title="@string/share"
+		app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+		app:showAsAction="always" />
+
+	<item
+		android:id="@+id/view_at_web"
+		android:title="@string/view_at_web"
+		app:showAsAction="never" />
+
+	<item
+		android:id="@+id/view_all"
+		android:title="@string/view_all"
+		app:showAsAction="never" />
+
+</menu>

@@ -8,10 +8,17 @@
 	<string name="load_data_error">载入数据出错:-(%1$s</string>
 	<string name="empty_list">没有任何数据，请尝试刷新按钮！</string>
 	<string name="load_complete">数据成功缓存到本地！</string>
+	<string name="not_found">对不起，没有找个相关的资源！</string>
+	<string name="share">分享</string>
+	<string name="view_at_web">在网页上查看</string>
+	<string name="view_all">查看所有的回答</string>
+	<string name="share_from"> --分享自知乎阅读</string>
 
 	<string-array name="pager_titles">
 		<item>热门</item>
 		<item>用户</item>
 	</string-array>
+
+	<color name="bgcolor">#fff3f3f3</color>
 
 </resources>

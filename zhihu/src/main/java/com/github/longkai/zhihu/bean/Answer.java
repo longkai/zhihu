@@ -59,9 +59,10 @@ public class Answer implements Parcelable {
 		dest.writeLong(last_alter_date);
 		dest.writeLong(id);
 
-		dest.writeParcelable(question, flags);
-		dest.writeParcelable(user, flags);
-
+//		dest.writeParcelable(question, flags);
+//		dest.writeParcelable(user, flags);
+		dest.writeLong(question.id);
+		dest.writeString(user.id);
 		// write array' s length first
 //		dest.writeInt(voters.length);
 //		dest.writeTypedArray(voters, flags);
@@ -78,9 +79,13 @@ public class Answer implements Parcelable {
 			answer.last_alter_date = source.readLong();
 			answer.id = source.readLong();
 
-			answer.question = source.readParcelable(null);
-			answer.user = source.readParcelable(null);
+//			answer.question = source.readParcelable(null);
+//			answer.user = source.readParcelable(null);
+			answer.question = new Question();
+			answer.question.id = source.readLong();
 
+			answer.user = new User();
+			answer.user.id = source.readString();
 			// read the array' s length first
 //			int length = source.readInt();
 //			answer.voters = Voter.CREATOR.newArray(length);

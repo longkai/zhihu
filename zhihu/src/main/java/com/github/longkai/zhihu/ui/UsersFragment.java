@@ -6,7 +6,6 @@
 package com.github.longkai.zhihu.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +25,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.ZhihuApp;
 import com.github.longkai.zhihu.util.Constants;
+import com.github.longkai.zhihu.util.Utils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,9 +58,7 @@ public class UsersFragment extends ListFragment implements LoaderManager.LoaderC
 		Cursor cursor = mAdapter.getCursor();
 		String account = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
 		// go to zhihu.com
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setData(Uri.parse("http://www.zhihu.com/people/" + account));
-		getActivity().startActivity(intent);
+		Utils.viewUserInfo(getActivity(), account);
 	}
 
 	@Override

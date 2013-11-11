@@ -9,7 +9,7 @@ import android.net.Uri;
 import com.github.longkai.zhihu.provider.ZhihuProvider;
 
 /**
- * Created with IntelliJ IDEA.
+ * 常量值
  *
  * @User longkai
  * @Date 13-11-10
@@ -38,7 +38,8 @@ public class Constants {
 	 * @return
 	 */
 	public static String url(int page) {
-		return "http://www.zhihu.com/reader/json/" + page + "?r=" + System.currentTimeMillis();
+		return "http://www.zhihu.com/reader/json/"
+				+ page + "?r=" + System.currentTimeMillis();
 	}
 
 }

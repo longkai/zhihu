@@ -50,7 +50,7 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 	private boolean loading;
 
-	private static final int COUNT = 5;
+	private static final int COUNT = 5; // 每次加载的步长为5个
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,7 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		// 列表为空的试图和加载更多的按钮
 		setEmptyText(getString(R.string.empty_list));
 		loadMore = (Button) getActivity().getLayoutInflater().inflate(R.layout.load_more, null);
 		loadMore.setText(getString(R.string.load_more));
@@ -69,9 +70,10 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 		setListAdapter(mAdapter);
 		getLoaderManager().initLoader(0, null, this);
-		setHasOptionsMenu(true); // search
+		setHasOptionsMenu(true); // for search
 	}
 
+	// 关键字查询标题和内容是否有相符合的
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		MenuItem search = menu.add(android.R.string.search_go);
@@ -118,7 +120,6 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 		new AsyncQueryHandler(getActivity().getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-//				mAdapter.swapCursor(cursor);
 				Utils.viewAnswer(getActivity(), cursor);
 			}
 		}.startQuery(0, null, parseUri(ANSWERS), null, "qid=" + id, null, null);
@@ -128,15 +129,17 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		Uri uri = parseUri(QUESTIONS);
 		String selection = null;
+		// 判断一下是否是用户来查询
 		if (!TextUtils.isEmpty(keywords)) {
 			String like = "'%" + keywords + "%'";
 			selection = "title like " + like
 					+ " or description like " + like;
 		}
+		// roll back the load more button
+		loadMore.setClickable(true);
+		loadMore.setText(R.string.load_more);
 		return new CursorLoader(getActivity(), uri, null, selection, null, "_id desc limit " + (page * COUNT));
 	}
-
-
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -152,13 +155,15 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 	public void onClick(View v) {
 		loading = true;
 		page++;
-
+		// 异步加载更多数据
 		new AsyncQueryHandler(getActivity().getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				mAdapter.swapCursor(cursor);
 				loading = false;
 				if (cursor.moveToLast()) {
+					// 如果到了最后一个，那么这个button就不能按了，
+					// 这里，简单的已id值为最小的作为最后一个，实际上顺序不是这样的= =
 					long l1 = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 					long l2 = ZhihuApp.getApp().getPreferences().getLong(BaseColumns._ID, 0);
 					if (l1 == l2) {
@@ -192,8 +197,6 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 			holder.titleIndex = cursor.getColumnIndex("title");
 			holder.viewed = (TextView) view.findViewById(R.id.viewed);
 			holder.viewedIndex = cursor.getColumnIndex("viewed");
-//			holder.desc = (TextView) view.findViewById(R.id.desc);
-//			holder.descIndex = cursor.getColumnIndex("description");
 
 			holder.nice = (ImageView) view.findViewById(R.id.nice);
 
@@ -205,10 +208,7 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 		public void bindView(View view, Context context, Cursor cursor) {
 			ViewHolder holder = (ViewHolder) view.getTag();
 			holder.title.setText(cursor.getString(holder.titleIndex));
-//			String desc = cursor.getString(holder.descIndex);
-//			holder.desc.setText(desc.length() > 30 ? desc.substring(0, 30) : desc);
 			holder.viewed.setText(cursor.getString(holder.viewedIndex));
-//			holder.nice.setImageResource(R.drawable.rating_not_important_light);
 		}
 
 		private static class ViewHolder {
@@ -219,9 +219,6 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 			TextView viewed;
 			int viewedIndex;
-
-//			TextView desc;
-//			int descIndex;
 		}
 	}
 

@@ -95,7 +95,7 @@ public class AnswerActivity extends ActionBarActivity {
 			case android.R.id.home:
 				finish();
 				break;
-			case R.id.author:
+			case R.id.author: // 去web上查看用户信息
 				new AsyncQueryHandler(getContentResolver()) {
 					@Override
 					protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
@@ -108,11 +108,11 @@ public class AnswerActivity extends ActionBarActivity {
 				}.startQuery(0, null, parseUri(USERS), new String[]{BaseColumns._ID},
 						"_id='" + answer.user.id + "'", null, null);
 				break;
-			case R.id.view_at_web:
+			case R.id.view_at_web: // 去web上查看该答案
 				Utils.viewOnWeb(this, Uri.parse("http://www.zhihu.com/question/"
 						+ answer.question.id + "/answer/" + answer.id));
 				break;
-			case R.id.view_all:
+			case R.id.view_all:    // 在web上查看所有的答案
 				Utils.viewOnWeb(this, Uri.parse("http://www.zhihu.com/question/"
 						+ answer.question.id));
 				break;
@@ -131,6 +131,7 @@ public class AnswerActivity extends ActionBarActivity {
 
 			final TextView title = (TextView) view.findViewById(android.R.id.title);
 			final WebView desc = (WebView) view.findViewById(R.id.description);
+			// 由于bean间的关系被弄复杂了，以至于现在还要再去抓一次 `问题`
 			new AsyncQueryHandler(getActivity().getContentResolver()) {
 				@Override
 				protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
@@ -150,12 +151,11 @@ public class AnswerActivity extends ActionBarActivity {
 			final TextView nick = (TextView) view.findViewById(R.id.nick);
 			final ImageView avatar = (ImageView) view.findViewById(R.id.avatar);
 			final TextView status = (TextView) view.findViewById(R.id.status);
+			// 同上，再抓一次 `作者`
 			new AsyncQueryHandler(getActivity().getContentResolver()) {
 				@Override
 				protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 					if (cursor.moveToNext()) {
-//						nick.setText(cursor.getString(cursor.getColumnIndex("nick")) + "\t"
-//								+ cursor.getString(cursor.getColumnIndex("status")));
 						nick.setText(cursor.getString(cursor.getColumnIndex("nick")));
 						String src = cursor.getString(cursor.getColumnIndex("avatar"));
 						ZhihuApp.getImageLoader().get(src, ImageLoader.getImageListener(avatar,

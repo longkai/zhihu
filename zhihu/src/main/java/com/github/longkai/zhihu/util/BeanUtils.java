@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
+ * 把json数据序列化为bean以及将bean转换为content values相关方法
  *
  * @User longkai
  * @Date 13-11-10

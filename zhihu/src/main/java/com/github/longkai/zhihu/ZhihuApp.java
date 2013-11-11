@@ -30,10 +30,10 @@ public class ZhihuApp extends Application implements SharedPreferences.OnSharedP
 
 	public static final String TAG = "ZhihuApp";
 
-	private static ZhihuApp sApp;
+	private static ZhihuApp sApp; // 全局对象
 
-	private static RequestQueue sQueue;
-	private static ImageLoader sLoader;
+	private static RequestQueue sQueue; // 异步进行网络连接请求的队列
+	private static ImageLoader sLoader; // 异步网络图片抓取与缓存
 
 	private SharedPreferences mPreferences;
 

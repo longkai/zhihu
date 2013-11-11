@@ -32,6 +32,11 @@ public class Constants {
 		return Uri.parse(ZhihuProvider.BASE_URI + path);
 	}
 
+	/**
+	 * page == 1 表示第一页，最新的那页
+	 * @param page
+	 * @return
+	 */
 	public static String url(int page) {
 		return "http://www.zhihu.com/reader/json/" + page + "?r=" + System.currentTimeMillis();
 	}

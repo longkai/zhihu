@@ -37,7 +37,7 @@ public class FetchService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		String data = intent.getExtras().getString("data");
-		JSONArray jsonArray = null;
+		JSONArray jsonArray;
 		try {
 			jsonArray = new JSONArray(data);
 		} catch (JSONException e) {
@@ -49,6 +49,7 @@ public class FetchService extends IntentService {
 		notification(getString(R.string.done_fetch, jsonArray.length()));
 	}
 
+	// 在通知栏弹出一个通知
 	private void notification(String text) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 		builder.setSmallIcon(R.drawable.ic_launcher)

@@ -43,6 +43,7 @@ public class MainActivity extends ActionBarActivity implements
 
     private ViewPager mViewPager;
 
+	// 抽屉相关
 	private CursorAdapter mAdapter;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawer;
@@ -68,6 +69,7 @@ public class MainActivity extends ActionBarActivity implements
             }
         });
 
+	    // tab titles
 	    for (int i = 0; i < titles.length; i++) {
             actionBar.addTab(
                     actionBar.newTab()
@@ -121,14 +123,14 @@ public class MainActivity extends ActionBarActivity implements
 		    return true;
 	    }
 	    switch (item.getItemId()) {
-		    case R.id.action_quit:
+		    case R.id.action_quit: // 退出，实际上是返回的桌面
 			    // fake, go back to home = =
 			    Intent i = new Intent(Intent.ACTION_MAIN);
 			    i.addCategory(Intent.CATEGORY_HOME);
 			    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			    startActivity(i);
 			    break;
-		    case R.id.refresh:
+		    case R.id.refresh: // 抓取新的数据并缓存到本地
 			    ZhihuApp.getRequestQueue().add(new StringRequest(Request.Method.GET, url(1), new Response.Listener<String>() {
 				    @Override
 				    public void onResponse(String response) {
@@ -205,9 +207,11 @@ public class MainActivity extends ActionBarActivity implements
 		String keywords2 = id + ",";
 		String selection = "topics like '%" + keywords1 + "%' or topics like '%" + keywords2 + "%'";
 
+		// 这里写的复杂了= =
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				// 标题和相关的id对应上
 				String[] titles = new String[cursor.getCount()];
 				final long[] ids = new long[titles.length];
 				int i = 0;
@@ -215,8 +219,10 @@ public class MainActivity extends ActionBarActivity implements
 					titles[i] = cursor.getString(cursor.getColumnIndex("title"));
 					ids[i] = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 				}
+				// 弹出的对话框中包含我们查询到的结果
 				new AlertDialog.Builder(MainActivity.this)
 						.setItems(titles, new DialogInterface.OnClickListener() {
+							// 处理在对话框的列表项目的点击事件
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								new AsyncQueryHandler(getContentResolver()) {

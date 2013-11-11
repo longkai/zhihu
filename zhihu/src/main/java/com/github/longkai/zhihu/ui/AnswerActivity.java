@@ -19,9 +19,12 @@ import android.text.format.DateUtils;
 import android.view.*;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.android.volley.toolbox.ImageLoader;
 import com.github.longkai.zhihu.R;
+import com.github.longkai.zhihu.ZhihuApp;
 import com.github.longkai.zhihu.bean.Answer;
 import com.github.longkai.zhihu.util.Utils;
 
@@ -144,13 +147,20 @@ public class AnswerActivity extends ActionBarActivity {
 			}.startQuery(0, null, parseUri(QUESTIONS), null,
 					"_id=" + answer.question.id, null, null);
 
-			final TextView author = (TextView) view.findViewById(R.id.author);
+			final TextView nick = (TextView) view.findViewById(R.id.nick);
+			final ImageView avatar = (ImageView) view.findViewById(R.id.avatar);
+			final TextView status = (TextView) view.findViewById(R.id.status);
 			new AsyncQueryHandler(getActivity().getContentResolver()) {
 				@Override
 				protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 					if (cursor.moveToNext()) {
-						author.setText(cursor.getString(cursor.getColumnIndex("nick")) + "\t"
-								+ cursor.getString(cursor.getColumnIndex("status")));
+//						nick.setText(cursor.getString(cursor.getColumnIndex("nick")) + "\t"
+//								+ cursor.getString(cursor.getColumnIndex("status")));
+						nick.setText(cursor.getString(cursor.getColumnIndex("nick")));
+						String src = cursor.getString(cursor.getColumnIndex("avatar"));
+						ZhihuApp.getImageLoader().get(src, ImageLoader.getImageListener(avatar,
+								R.drawable.ic_launcher, R.drawable.ic_launcher));
+						status.setText(cursor.getString(cursor.getColumnIndex("status")));
 					}
 				}
 			}.startQuery(0, null, parseUri(USERS),

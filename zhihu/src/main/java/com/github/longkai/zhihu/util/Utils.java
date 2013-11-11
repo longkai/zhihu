@@ -7,8 +7,15 @@ package com.github.longkai.zhihu.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.BaseColumns;
+import android.widget.Toast;
 import com.github.longkai.zhihu.R;
+import com.github.longkai.zhihu.bean.Answer;
+import com.github.longkai.zhihu.bean.Question;
+import com.github.longkai.zhihu.bean.User;
+import com.github.longkai.zhihu.ui.AnswerActivity;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +49,29 @@ public class Utils {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(uri);
 		context.startActivity(intent);
+	}
+
+	public static void viewAnswer(Context context, Cursor cursor) {
+		if (cursor.moveToNext()) {
+			Answer answer = new Answer();
+			answer.last_alter_date = cursor.getLong(cursor.getColumnIndex("last_alter_date"));
+			answer.vote = cursor.getInt(cursor.getColumnIndex("vote"));
+			answer.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+			answer.status = cursor.getString(cursor.getColumnIndex("status"));
+			answer.answer = cursor.getString(cursor.getColumnIndex("answer"));
+
+			answer.question = new Question();
+			answer.question.id = cursor.getLong(cursor.getColumnIndex("qid"));
+
+			answer.user = new User();
+			answer.user.id = cursor.getString(cursor.getColumnIndex("uid"));
+
+			Intent intent = new Intent(context, AnswerActivity.class);
+			intent.putExtra("answer", answer);
+			context.startActivity(intent);
+		} else {
+			Toast.makeText(context, context.getString(R.string.not_found), Toast.LENGTH_LONG).show();
+		}
 	}
 
 }

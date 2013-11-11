@@ -101,21 +101,21 @@ public class BeanUtils {
 		values.put("viewed", question.viewed);
 
 		// use jsonarray string to store the topics belong to
-//		String topics = "[";
-//		for (int i = 0; i < question.topics.length; i++) {
-//			topics += question.topics[i].id;
-//			if (i != question.topics.length - 1) {
-//				topics += ",";
-//			}
-//		}
-		String topics = "";
+		String topics = "[";
 		for (int i = 0; i < question.topics.length; i++) {
-			topics += question.topics[i].name;
+			topics += question.topics[i].id;
 			if (i != question.topics.length - 1) {
-				topics += "|";
+				topics += ",";
 			}
 		}
-//		values.put("topics", topics + "]");
+//		String topics = "";
+//		for (int i = 0; i < question.topics.length; i++) {
+//			topics += question.topics[i].name;
+//			if (i != question.topics.length - 1) {
+//				topics += "|";
+//			}
+//		}
+		values.put("topics", topics + "]");
 		values.put("topics", topics);
 
 		return values;

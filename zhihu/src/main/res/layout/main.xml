@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2013 longkai(龙凯)
+  ~ The software shall be used for good, not evil.
+  -->
+
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/drawer_layout"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<include
+		layout="@layout/pager" />
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_gravity="left"
+		android:background="@color/bgcolor"
+		android:layout_width="@dimen/drawer_width"
+		android:layout_height="match_parent">
+
+		<TextView
+			android:textAppearance="@android:style/TextAppearance.Large"
+			android:textColor="@color/holo_blue_light"
+			android:textStyle="bold"
+			android:padding="@dimen/default_padding"
+			android:text="@string/topics"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<ListView
+			android:id="@+id/left_drawer"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@color/bgcolor" />
+	</LinearLayout>
+</android.support.v4.widget.DrawerLayout>

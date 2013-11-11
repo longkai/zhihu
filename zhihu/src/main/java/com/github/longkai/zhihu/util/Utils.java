@@ -8,6 +8,7 @@ package com.github.longkai.zhihu.util;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.widget.Toast;
@@ -18,7 +19,7 @@ import com.github.longkai.zhihu.bean.User;
 import com.github.longkai.zhihu.ui.AnswerActivity;
 
 /**
- * Created with IntelliJ IDEA.
+ * 一些工具类
  *
  * @User longkai
  * @Date 13-11-11
@@ -28,6 +29,7 @@ public class Utils {
 
 	/**
 	 * view user' s infomation on the web.
+	 *
 	 * @param context
 	 * @param id
 	 */
@@ -72,6 +74,18 @@ public class Utils {
 		} else {
 			Toast.makeText(context, context.getString(R.string.not_found), Toast.LENGTH_LONG).show();
 		}
+	}
+
+	public static void createTables(Context context, SQLiteDatabase db) {
+		db.execSQL(context.getString(R.string.table_users));
+		db.execSQL(context.getString(R.string.table_topics));
+		db.execSQL(context.getString(R.string.table_voters));
+		db.execSQL(context.getString(R.string.table_questions));
+		db.execSQL(context.getString(R.string.table_answers));
+	}
+
+	public static void dropTables(Context context, SQLiteDatabase db) {
+		db.execSQL(context.getString(R.string.drop_all_table));
 	}
 
 }

@@ -12,4 +12,10 @@
 		android:icon="@drawable/navigation_refresh_light"
 		app:showAsAction="always" />
 
+	<item
+		android:id="@+id/delete"
+		android:title="清空本地缓存"
+		android:icon="@drawable/content_discard_light"
+		app:showAsAction="ifRoom" />
+
 </menu>

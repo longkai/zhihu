@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">zhihu</string>
+    <string name="app_name">知乎阅读</string>
     <string name="action_settings">Settings</string>
 	<string name="action_quit">退出</string>
 	<string name="refresh">刷新</string>
@@ -17,10 +17,17 @@
 	<string name="close_drawer">关闭导航侧边栏</string>
 	<string name="topics">当前话题</string>
 	<string name="search_found">找到的结果</string>
+	<string name="delte_cache_success">成功清除缓存！</string>
+	<string name="not_yet_impl">暂未实现= =</string>
+	<string name="please_wait">请稍等</string>
+	<string name="loading_data">正在更新数据中。。。</string>
+	<string name="done_fetch">成功更新了 %1$s 篇内容！</string>
+	<string name="load_more">加载更多...</string>
+	<string name="no_more">没有更多啦:-)</string>
 
 	<string-array name="pager_titles">
 		<item>热门</item>
-		<item>用户</item>
+		<item>知友</item>
 	</string-array>
 
 	<color name="bgcolor">#fff3f3f3</color>

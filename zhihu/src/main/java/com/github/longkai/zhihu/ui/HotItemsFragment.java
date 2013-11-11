@@ -10,6 +10,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -19,12 +20,16 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SearchViewCompat;
 import android.text.TextUtils;
 import android.view.*;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.github.longkai.zhihu.R;
+import com.github.longkai.zhihu.ZhihuApp;
 import com.github.longkai.zhihu.util.Constants;
 import com.github.longkai.zhihu.util.Utils;
+
+import static com.github.longkai.zhihu.util.Constants.*;
 
 /**
  * 热门问答。
@@ -33,11 +38,19 @@ import com.github.longkai.zhihu.util.Utils;
  * @Date 13-11-10
  * @Mail im.longkai@gmail.com
  */
-public class HotItemsFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class HotItemsFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
 	private CursorAdapter mAdapter;
 
+	private Button loadMore;
+
 	private String keywords;
+
+	private int page = 1;
+
+	private boolean loading;
+
+	private static final int COUNT = 5;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +62,11 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setEmptyText(getString(R.string.empty_list));
+		loadMore = (Button) getActivity().getLayoutInflater().inflate(R.layout.load_more, null);
+		loadMore.setText(getString(R.string.load_more));
+		loadMore.setOnClickListener(this);
+		getListView().addFooterView(loadMore);
+
 		setListAdapter(mAdapter);
 		getLoaderManager().initLoader(0, null, this);
 		setHasOptionsMenu(true); // search
@@ -103,20 +121,22 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 //				mAdapter.swapCursor(cursor);
 				Utils.viewAnswer(getActivity(), cursor);
 			}
-		}.startQuery(0, null, Constants.parseUri(Constants.ANSWERS), null, "qid=" + id, null, null);
+		}.startQuery(0, null, parseUri(ANSWERS), null, "qid=" + id, null, null);
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Uri uri = Constants.parseUri(Constants.QUESTIONS);
-		String seletion = null;
+		Uri uri = parseUri(QUESTIONS);
+		String selection = null;
 		if (!TextUtils.isEmpty(keywords)) {
 			String like = "'%" + keywords + "%'";
-			seletion = "title like " + like
+			selection = "title like " + like
 					+ " or description like " + like;
 		}
-		return new CursorLoader(getActivity(), uri, null, seletion, null, null);
+		return new CursorLoader(getActivity(), uri, null, selection, null, "_id desc limit " + (page * COUNT));
 	}
+
+
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -126,6 +146,30 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onClick(View v) {
+		loading = true;
+		page++;
+
+		new AsyncQueryHandler(getActivity().getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				mAdapter.swapCursor(cursor);
+				loading = false;
+				if (cursor.moveToLast()) {
+					long l1 = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+					long l2 = ZhihuApp.getApp().getPreferences().getLong(BaseColumns._ID, 0);
+					if (l1 == l2) {
+						loadMore.setText(getString(R.string.no_more));
+						loadMore.setClickable(false);
+					}
+				}
+			}
+		}.startQuery(0, null, Constants.parseUri(Constants.QUESTIONS),
+				null, null, null, "_id desc limit " + (page * COUNT));
+
 	}
 
 

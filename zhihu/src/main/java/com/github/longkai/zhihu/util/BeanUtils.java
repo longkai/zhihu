@@ -8,8 +8,6 @@ package com.github.longkai.zhihu.util;
 import android.content.ContentValues;
 import android.content.Context;
 import android.provider.BaseColumns;
-import android.widget.Toast;
-import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.bean.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -255,8 +253,6 @@ public class BeanUtils {
 			i++;
 		}
 		context.getContentResolver().bulkInsert(Constants.parseUri(Constants.VOTERS), valueses);
-
-		Toast.makeText(context, context.getString(R.string.load_complete), Toast.LENGTH_LONG).show();
 	}
 
 }

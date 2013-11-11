@@ -30,6 +30,7 @@
 		<provider
 			android:authorities="com.github.longkai.zhihu.provider"
 			android:name=".provider.ZhihuProvider" />
+		<service android:name=".service.FetchService" />
 	</application>
 
 </manifest>

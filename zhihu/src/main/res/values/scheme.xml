@@ -81,6 +81,6 @@
 		DROP TABLE IF EXISTS topics;
 		DROP TABLE IF EXISTS voters;
 		DROP TABLE IF EXISTS questions;
-		DROP TABLE IF EXISTS question_topics;
+		DROP TABLE IF EXISTS answers;
 	</string>
 </resources>

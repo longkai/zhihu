@@ -24,6 +24,10 @@ public class Constants {
 	public static final String VOTERS = "voters";
 	public static final String QUESTION_TOPICS = "question_topics";
 
+	public static final String DELETE = "delete";
+
+	public static final String DATA = "data";
+
 	public static Uri parseUri(String path) {
 		return Uri.parse(ZhihuProvider.BASE_URI + path);
 	}

@@ -22,17 +22,18 @@ import android.text.Html;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.github.longkai.android.app.ActionBarDrawerHelper;
 import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.ZhihuApp;
-import com.github.longkai.zhihu.util.BeanUtils;
-import com.github.longkai.zhihu.util.Constants;
+import com.github.longkai.zhihu.service.FetchService;
 import com.github.longkai.zhihu.util.Utils;
-import org.json.JSONArray;
+
+import static com.github.longkai.zhihu.util.Constants.*;
 
 public class MainActivity extends ActionBarActivity implements
 		ActionBar.TabListener, DrawerLayout.DrawerListener,
@@ -128,19 +129,33 @@ public class MainActivity extends ActionBarActivity implements
 			    startActivity(i);
 			    break;
 		    case R.id.refresh:
-			    ZhihuApp.getRequestQueue().add(new JsonArrayRequest(Constants.url(1), new Response.Listener<JSONArray>() {
+			    ZhihuApp.getRequestQueue().add(new StringRequest(Request.Method.GET, url(1), new Response.Listener<String>() {
 				    @Override
-				    public void onResponse(JSONArray response) {
-					    BeanUtils.persist(MainActivity.this, response);
+				    public void onResponse(String response) {
+					    Intent intent = new Intent(MainActivity.this, FetchService.class);
+					    intent.putExtra(DATA, response);
+					    Toast.makeText(MainActivity.this, R.string.loading_data, Toast.LENGTH_SHORT).show();
+						MainActivity.this.startService(intent);
 				    }
 			    }, new Response.ErrorListener() {
 				    @Override
 				    public void onErrorResponse(VolleyError error) {
 					    Toast.makeText(MainActivity.this,
 							    getString(R.string.load_data_error, error.getLocalizedMessage()),
-							        Toast.LENGTH_SHORT).show();
+							    Toast.LENGTH_SHORT).show();
 				    }
-			    }));
+			    }
+			    ));
+			    break;
+		    case R.id.delete:
+//			    new AsyncQueryHandler(getContentResolver()) {
+//				    @Override
+//				    protected void onDeleteComplete(int token, Object cookie, int result) {
+//					    Toast.makeText(MainActivity.this, getString(R.string.delte_cache_success), Toast.LENGTH_SHORT).show();
+//				    }
+//			    }.startDelete(0, null, Constants.parseUri(Constants.DELETE), null, null);
+//              todo 直接删除再重建居然有问题。。。
+			    Toast.makeText(this, getString(R.string.not_yet_impl), Toast.LENGTH_SHORT).show();
 			    break;
 		    default:
 			    Log.e(TAG, "no this option!");
@@ -209,7 +224,7 @@ public class MainActivity extends ActionBarActivity implements
 									protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 										Utils.viewAnswer(MainActivity.this, cursor);
 									}
-								}.startQuery(0, null, Constants.parseUri(Constants.ANSWERS), null, "qid=" + ids[which], null, null);
+								}.startQuery(0, null, parseUri(ANSWERS), null, "qid=" + ids[which], null, null);
 							}
 						})
 						.setIcon(R.drawable.ic_launcher)
@@ -217,7 +232,7 @@ public class MainActivity extends ActionBarActivity implements
 						.setNeutralButton(android.R.string.ok, null)
 						.show();
 			}
-		}.startQuery(0, null, Constants.parseUri(Constants.QUESTIONS),
+		}.startQuery(0, null, parseUri(QUESTIONS),
 				new String[]{BaseColumns._ID, "title"}, selection, null, null);
 
 //		todo bug here fc =.=
@@ -226,7 +241,7 @@ public class MainActivity extends ActionBarActivity implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		return new CursorLoader(this, Constants.parseUri(Constants.TOPICS), null, null, null, null);
+		return new CursorLoader(this, parseUri(TOPICS), null, null, null, null);
 	}
 
 	@Override

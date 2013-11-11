@@ -17,6 +17,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.util.Constants;
+import com.github.longkai.zhihu.util.Utils;
 
 /**
  * 知乎阅读数据源。
@@ -46,6 +47,8 @@ public class ZhihuProvider extends ContentProvider {
 	public static final int TOPIC = 7;
 	public static final int VOTERS = 8; // array, no single
 
+	public static final int DELETE = 9;
+
 	static {
 		matcher.addURI(AUTHORITY, Constants.USERS, USERS);
 		matcher.addURI(AUTHORITY, Constants.USERS + "/#", USER);
@@ -60,6 +63,7 @@ public class ZhihuProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, Constants.TOPICS + "/#", TOPIC);
 
 		matcher.addURI(AUTHORITY, Constants.VOTERS, VOTERS);
+		matcher.addURI(AUTHORITY, Constants.DELETE, DELETE);
 	}
 
 	private ZhihuData mData;
@@ -194,7 +198,17 @@ public class ZhihuProvider extends ContentProvider {
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		throw new UnsupportedOperationException("UnsupportedOperationException");
+		SQLiteDatabase db = mData.getWritableDatabase();
+		switch (matcher.match(uri)) {
+			case DELETE:
+				Utils.dropTables(getContext(), db);
+				Utils.createTables(getContext(), db);
+				break;
+			default:
+				throw new UnsupportedOperationException("UnsupportedOperationException");
+		}
+		getContext().getContentResolver().notifyChange(uri, null, false);
+		return 0;
 	}
 
 	@Override
@@ -212,18 +226,14 @@ public class ZhihuProvider extends ContentProvider {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			Log.d(TAG, "begin creating tables...");
-			db.execSQL(getContext().getString(R.string.table_users));
-			db.execSQL(getContext().getString(R.string.table_topics));
-			db.execSQL(getContext().getString(R.string.table_voters));
-			db.execSQL(getContext().getString(R.string.table_questions));
-			db.execSQL(getContext().getString(R.string.table_answers));
+			Utils.createTables(getContext(), db);
 			Log.d(TAG, "end creating tables...");
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.d(TAG, "drop all tables...");
-			db.execSQL(getContext().getString(R.string.drop_all_table));
+			Utils.dropTables(getContext(), db);
 
 			Log.d(TAG, "recreate tables...");
 			onCreate(db);

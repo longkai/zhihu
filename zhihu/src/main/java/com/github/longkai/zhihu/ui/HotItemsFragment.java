@@ -6,7 +6,6 @@
 package com.github.longkai.zhihu.ui;
 
 import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,10 +16,11 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v4.widget.SearchViewCompat;
+import android.text.TextUtils;
+import android.view.*;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,6 +42,8 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 	private CursorAdapter mAdapter;
 
+	private String keywords;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,6 +56,47 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 		setEmptyText(getString(R.string.empty_list));
 		setListAdapter(mAdapter);
 		getLoaderManager().initLoader(0, null, this);
+		setHasOptionsMenu(true); // search
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		MenuItem search = menu.add(android.R.string.search_go);
+		search.setIcon(R.drawable.action_search_light);
+		// earn some room in action bar
+		MenuItemCompat.setShowAsAction(search, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+		final View searchView = SearchViewCompat.newSearchView(getActivity());
+		if (searchView != null) {
+			SearchViewCompat.setOnQueryTextListener(searchView,
+					new SearchViewCompat.OnQueryTextListenerCompat() {
+						@Override
+						public boolean onQueryTextChange(String newText) {
+							String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
+							if (keywords == null && newFilter == null) {
+								return true;
+							}
+							if (keywords != null && keywords.equals(newFilter)) {
+								return true;
+							}
+							keywords = newFilter;
+							getLoaderManager().restartLoader(0, null, HotItemsFragment.this);
+							return true;
+						}
+					});
+			SearchViewCompat.setOnCloseListener(searchView,
+					new SearchViewCompat.OnCloseListenerCompat() {
+						@Override
+						public boolean onClose() {
+							if (!TextUtils.isEmpty(SearchViewCompat.getQuery(searchView))) {
+								SearchViewCompat.setQuery(searchView, null, true);
+								return true;
+							}
+							return false;
+						}
+
+					});
+			MenuItemCompat.setActionView(search, searchView);
+		}
 	}
 
 	@Override
@@ -90,7 +133,13 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		Uri uri = Constants.parseUri(Constants.QUESTIONS);
-		return new CursorLoader(getActivity(), uri, null, null, null, null);
+		String seletion = null;
+		if (!TextUtils.isEmpty(keywords)) {
+			String like = "'%" + keywords + "%'";
+			seletion = "title like " + like
+					+ " or description like " + like;
+		}
+		return new CursorLoader(getActivity(), uri, null, seletion, null, null);
 	}
 
 	@Override
@@ -103,12 +152,6 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 		mAdapter.swapCursor(null);
 	}
 
-	private static class QueryHandler extends AsyncQueryHandler {
-
-		public QueryHandler(ContentResolver cr) {
-			super(cr);
-		}
-	}
 
 	/**
 	 * 热门内容列表适配器。

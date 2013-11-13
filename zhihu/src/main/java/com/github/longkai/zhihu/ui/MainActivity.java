@@ -218,6 +218,7 @@ public class MainActivity extends ActionBarActivity implements
 				while (cursor.moveToNext()) {
 					titles[i] = cursor.getString(cursor.getColumnIndex("title"));
 					ids[i] = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+					i++;
 				}
 				// 弹出的对话框中包含我们查询到的结果
 				new AlertDialog.Builder(MainActivity.this)

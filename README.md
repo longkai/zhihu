@@ -45,9 +45,9 @@ zhihu/              最终构建app的项目，包含
     build.gralde    最终项目的构建配置（依赖了以上两个项目，以及support-v4与support-v7 appcompat）
 ```
 
-**所有的`src/main/java`表示android源代码**
+**所有的src/main/java表示android源代码**
 
-**所有的`src/main/res`表示android资源文件**
+**所有的src/main/res表示android资源文件**
 
 ## 如何构建（首先确定自己达到了开发环境的要求，gradle非必需）
 1. 下载volley的源码 http://android.googlesource.com/platform/frameworks/volley

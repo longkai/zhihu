@@ -8,6 +8,7 @@ package com.github.longkai.zhihu.util;
 import android.content.ContentValues;
 import android.content.Context;
 import android.provider.BaseColumns;
+import android.util.Log;
 import com.github.longkai.zhihu.bean.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,7 +34,8 @@ public class BeanUtils {
 			voter.nick = jsonArray.getString(0);
 			voter.id = jsonArray.getString(1);
 		} catch (JSONException e) {
-			throw new RuntimeException("error when deserializing voter!", e);
+			Log.wtf(TAG, "error when deserializing voter!", e);
+//			throw new RuntimeException("error when deserializing voter!", e);
 		}
 
 		return voter;
@@ -56,7 +58,8 @@ public class BeanUtils {
 			topic.avatar = jsonArray.getString(3);
 			topic.id = jsonArray.getLong(4);
 		} catch (JSONException e) {
-			throw new RuntimeException("error when deserializing topic!", e);
+			Log.wtf(TAG, "error when deserializing topic!", e);
+//			throw new RuntimeException("error when deserializing topic!", e);
 		}
 		return topic;
 	}
@@ -84,7 +87,8 @@ public class BeanUtils {
 
 			// leave the topics filed alone
 		} catch (JSONException e) {
-			throw new RuntimeException("error when deserializing question!", e);
+			Log.wtf(TAG, "error when deserializing question!", e);
+//			throw new RuntimeException("error when deserializing question!", e);
 		}
 		return question;
 	}
@@ -127,7 +131,8 @@ public class BeanUtils {
 			user.avatar = jsonArray.getString(2);
 			user.hash = jsonArray.getString(3);
 		} catch (JSONException e) {
-			throw new RuntimeException("error when deserializing user!", e);
+			Log.wtf(TAG, "error when deserializing user!", e);
+//			throw new RuntimeException("error when deserializing user!", e);
 		}
 		return user;
 	}
@@ -154,7 +159,8 @@ public class BeanUtils {
 
 			// leave question, user, voters[] alone!
 		} catch (JSONException e) {
-			throw new RuntimeException("error when deserializing answer!", e);
+			Log.wtf(TAG, "error when deserializing answer!", e);
+//			throw new RuntimeException("error when deserializing answer!", e);
 		}
 		return answer;
 	}
@@ -213,6 +219,7 @@ public class BeanUtils {
 				questions[i].topics = _topics;
 			}
 		} catch (JSONException e) {
+			Log.wtf(TAG, "json deserializing error!", e);
 			throw new RuntimeException(e);
 		}
 

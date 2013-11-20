@@ -81,4 +81,7 @@ public class Constants {
     /** 回答者的查询列 */
     public static final String[] USER_PROJECTION = {BaseColumns._ID, UID, NICK, STATUS, AVATAR};
 
+    /** 问题的查询列 */
+    public static final String[] ITEMS_PROJECTION = {BaseColumns._ID, TITLE, ANSWER_ID, VIEWED};
+
 }

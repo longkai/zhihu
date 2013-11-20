@@ -7,6 +7,7 @@ package com.github.longkai.zhihu.ui;
 
 import android.content.AsyncQueryHandler;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -116,39 +117,37 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, final long id) {
-		// todo 这里有一个bug，假如有多个答案对应着同一个question id就跪了，看来按照java bean的关系做不太合适啊
-		new AsyncQueryHandler(getActivity().getContentResolver()) {
-			@Override
-			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				Utils.viewAnswer(getActivity(), cursor);
-			}
-		}.startQuery(0, null, parseUri(ANSWERS), null, "qid=" + id, null, null);
-	}
+        // 阅读
+        Intent intent = new Intent(getActivity(), AnswerActivity.class);
+        intent.putExtra(ANSWER_ID, id);
+        startActivity(intent);
+    }
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Uri uri = parseUri(QUESTIONS);
-		String selection = null;
-		// 判断一下是否是用户来查询
-		if (!TextUtils.isEmpty(keywords)) {
-			String like = "'%" + keywords + "%'";
-			selection = "title like " + like
-					+ " or description like " + like;
-		}
-		// roll back the load more button
-		loadMore.setClickable(true);
-		loadMore.setText(R.string.load_more);
-		return new CursorLoader(getActivity(), uri, null, selection, null, "_id desc limit " + (page * COUNT));
-	}
+        Uri uri = Utils.parseUri(ITEMS);
+        String selection = null;
+        // 判断一下是否是用户来查询
+        if (!TextUtils.isEmpty(keywords)) {
+            String like = Utils.like(keywords);
+            selection = "title like " + like
+                    + " or description like " + like;
+        }
+        // roll back the load more button
+        loadMore.setClickable(true);
+        loadMore.setText(R.string.load_more);
+        return new CursorLoader(getActivity(), uri, ITEMS_PROJECTION, selection, null,
+                "_id desc limit " + (page * COUNT));
+    }
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		mAdapter.swapCursor(data);
+		mAdapter.changeCursor(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		mAdapter.swapCursor(null);
+		mAdapter.changeCursor(null);
 	}
 
 	@Override
@@ -159,9 +158,10 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 		new AsyncQueryHandler(getActivity().getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				mAdapter.swapCursor(cursor);
+				mAdapter.changeCursor(cursor);
 				loading = false;
 				if (cursor.moveToLast()) {
+                    // todo 这个按钮有bug
 					// 如果到了最后一个，那么这个button就不能按了，
 					// 这里，简单的已id值为最小的作为最后一个，实际上顺序不是这样的= =
 					long l1 = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
@@ -172,8 +172,8 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 					}
 				}
 			}
-		}.startQuery(0, null, Constants.parseUri(Constants.QUESTIONS),
-				null, null, null, "_id desc limit " + (page * COUNT));
+		}.startQuery(0, null, Utils.parseUri(ITEMS), ITEMS_PROJECTION,
+                null, null, "_id desc limit " + (page * COUNT));
 
 	}
 
@@ -194,9 +194,9 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 			ViewHolder holder = new ViewHolder();
 			holder.title = (TextView) view.findViewById(android.R.id.title);
-			holder.titleIndex = cursor.getColumnIndex("title");
+			holder.titleIndex = cursor.getColumnIndex(TITLE);
 			holder.viewed = (TextView) view.findViewById(R.id.viewed);
-			holder.viewedIndex = cursor.getColumnIndex("viewed");
+			holder.viewedIndex = cursor.getColumnIndex(VIEWED);
 
 			holder.nice = (ImageView) view.findViewById(R.id.nice);
 

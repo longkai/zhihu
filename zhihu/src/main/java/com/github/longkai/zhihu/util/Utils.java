@@ -144,6 +144,15 @@ public class Utils {
         return url(1);
     }
 
+    /**
+     * sql模糊查询
+     * @param str
+     * @return '%str%'
+     */
+    public static String like(String str) {
+        return "'%" + str + "'%";
+    }
+
 	public static void createTables(SQLiteDatabase db) {
         StringBuilder sql = new StringBuilder();
         // 阅读项目数据表
@@ -201,12 +210,15 @@ public class Utils {
     }
 
     /**
-     * 通过key=value来查询
+     * 通过key=value来查询，字符串会加上单引号
      * @param key
      * @param value
      * @return key=value
      */
     public static String queryByKey(String key, Object value) {
+        if (value instanceof String) {
+            return key + "='" + value + "'";
+        }
         return key + "=" + value;
     }
 

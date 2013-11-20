@@ -5,6 +5,7 @@
  */
 package com.github.longkai.zhihu.util;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.widget.Toast;
+
 import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.bean.Answer;
 import com.github.longkai.zhihu.bean.Question;
@@ -19,8 +21,33 @@ import com.github.longkai.zhihu.bean.User;
 import com.github.longkai.zhihu.provider.ZhihuProvider;
 import com.github.longkai.zhihu.ui.AnswerActivity;
 
-import static com.github.longkai.zhihu.util.Constants.*;
+import org.json.JSONArray;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.github.longkai.zhihu.util.Constants.ANSWER;
+import static com.github.longkai.zhihu.util.Constants.ANSWERED;
+import static com.github.longkai.zhihu.util.Constants.ANSWER_ID;
+import static com.github.longkai.zhihu.util.Constants.AVATAR;
+import static com.github.longkai.zhihu.util.Constants.DESCRIPTION;
+import static com.github.longkai.zhihu.util.Constants.ITEMS;
+import static com.github.longkai.zhihu.util.Constants.LAST_ALTER_DATE;
+import static com.github.longkai.zhihu.util.Constants.NICK;
+import static com.github.longkai.zhihu.util.Constants.QUESTION_ID;
+import static com.github.longkai.zhihu.util.Constants.STARRED;
+import static com.github.longkai.zhihu.util.Constants.STATUS;
+import static com.github.longkai.zhihu.util.Constants.TITLE;
 import static com.github.longkai.zhihu.util.Constants.TOPICS;
+import static com.github.longkai.zhihu.util.Constants.TOPIC_AVATAR;
+import static com.github.longkai.zhihu.util.Constants.TOPIC_DESCRIPTION;
+import static com.github.longkai.zhihu.util.Constants.TOPIC_ID;
+import static com.github.longkai.zhihu.util.Constants.TOPIC_NAME;
+import static com.github.longkai.zhihu.util.Constants.UID;
+import static com.github.longkai.zhihu.util.Constants.VIEWED;
+import static com.github.longkai.zhihu.util.Constants.VOTE;
 import static com.github.longkai.zhihu.util.Constants.VOTERS;
 
 /**
@@ -31,6 +58,8 @@ import static com.github.longkai.zhihu.util.Constants.VOTERS;
  * @Mail im.longkai@gmail.com
  */
 public class Utils {
+
+    public static final String TAG = "Utils";
 
 	/**
 	 * view user' s infomation on the web.
@@ -161,6 +190,86 @@ public class Utils {
      */
     public static final String queryById(String id) {
         return BaseColumns._ID + "=" + id;
+    }
+
+    /**
+     * 处理从网络得到的数据并将其转换为ContentValues数据
+     * @param jsonArray data
+     * @return items和topics的content values map
+     */
+    public static Map<String, ContentValues[]> process(JSONArray jsonArray) {
+        ContentValues[] items = new ContentValues[jsonArray.length()];
+        List<ContentValues> topics = new ArrayList<ContentValues>();
+        ContentValues item;
+        ContentValues topic;
+        // 临时变量
+        JSONArray array;
+        JSONArray user;
+        JSONArray question;
+        JSONArray _topics;
+        JSONArray _topic;
+        // 存储某个项目所属于的话题的id值，依照这样的格式：123,321,456
+        StringBuilder topicIds = new StringBuilder();
+        for (int i = 0; i < items.length; i++) {
+            array = jsonArray.optJSONArray(i);
+            item = new ContentValues();
+
+            // 答案相关
+            item.put(STATUS, array.optString(1));
+            item.put(ANSWER, array.optString(2));
+            item.put(VOTE, array.optInt(3));
+            item.put(LAST_ALTER_DATE, array.optLong(4) * 1000);
+            item.put(ANSWER_ID, array.optLong(5));
+
+            // 答主相关
+            user = array.optJSONArray(6);
+            if (user != null) {
+                item.put(NICK, user.optString(0));
+                item.put(UID, user.optString(1));
+                item.put(AVATAR, user.optInt(2));
+            }
+
+            // 问题相关
+            question = array.optJSONArray(7);
+            if (question != null) {
+                item.put(TITLE, question.optString(1, null));
+                item.put(DESCRIPTION, question.optString(2));
+                item.put(QUESTION_ID, question.optLong(3));
+                item.put(STARRED , question.optLong(5));
+                item.put(VIEWED, question.optLong(6));
+            }
+
+            // 话题相关
+            topicIds.setLength(0);
+            if (!question.isNull(7)) {
+                _topics = question.optJSONArray(7);
+                for (int j = 0; j < _topics.length(); j++) {
+                    _topic = _topics.optJSONArray(j);
+                    topic = new ContentValues(4);
+                    topic.put(TOPIC_NAME, _topic.optString(1, null));
+                    topic.put(TOPIC_DESCRIPTION, _topic.optString(2));
+                    topic.put(TOPIC_AVATAR, _topic.optString(3));
+                    topic.put(TOPIC_ID, _topic.optLong(4));
+                    // todo 可能会有重复，但是存进数据库的话会replace主键相同的值，考虑要不要在这里去掉重复的话题再插入数据库
+                    topics.add(topic);
+
+                    // 处理本item所属的话题
+                    topicIds.append(_topic.optLong(4)).append(",");
+                }
+            }
+            item.put(TOPICS, topicIds.toString());
+
+            // 赞同用户们，直接存储json字符串
+            item.put(VOTERS, array.isNull(8)
+                    ? null : array.optJSONArray(8).toString());
+
+            items[i] = item;
+        }
+
+        Map<String, ContentValues[]> map = new HashMap<String, ContentValues[]>(2);
+        map.put(ITEMS, items);
+        map.put(TOPICS, topics.toArray(new ContentValues[0]));
+        return map;
     }
 
 }

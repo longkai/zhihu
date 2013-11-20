@@ -84,4 +84,7 @@ public class Constants {
     /** 问题的查询列 */
     public static final String[] ITEMS_PROJECTION = {BaseColumns._ID, TITLE, ANSWER_ID, VIEWED};
 
+    /** 阅读某篇回答的查询列 */
+    public static final String[] ITEM_PROJECTION = {QUESTION_ID, TITLE, DESCRIPTION, UID, NICK, AVATAR, STATUS, ANSWER, LAST_ALTER_DATE};
+
 }

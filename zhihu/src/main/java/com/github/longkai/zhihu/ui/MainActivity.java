@@ -31,6 +31,7 @@ import com.github.longkai.android.app.ActionBarDrawerHelper;
 import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.ZhihuApp;
 import com.github.longkai.zhihu.service.FetchService;
+import com.github.longkai.zhihu.util.Constants;
 import com.github.longkai.zhihu.util.Utils;
 
 import static com.github.longkai.zhihu.util.Constants.*;
@@ -131,7 +132,7 @@ public class MainActivity extends ActionBarActivity implements
 			    startActivity(i);
 			    break;
 		    case R.id.refresh: // 抓取新的数据并缓存到本地
-			    ZhihuApp.getRequestQueue().add(new StringRequest(Request.Method.GET, url(1), new Response.Listener<String>() {
+			    ZhihuApp.getRequestQueue().add(new StringRequest(Request.Method.GET, Utils.refreshUrl(), new Response.Listener<String>() {
 				    @Override
 				    public void onResponse(String response) {
 					    Intent intent = new Intent(MainActivity.this, FetchService.class);
@@ -226,14 +227,14 @@ public class MainActivity extends ActionBarActivity implements
 							// 处理在对话框的列表项目的点击事件
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								new AsyncQueryHandler(getContentResolver()) {
-									@Override
-									protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-										Utils.viewAnswer(MainActivity.this, cursor);
-									}
-								}.startQuery(0, null, parseUri(ANSWERS), null, "qid=" + ids[which], null, null);
-							}
-						})
+                                new AsyncQueryHandler(getContentResolver()) {
+                                    @Override
+                                    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                                        Utils.viewAnswer(MainActivity.this, cursor);
+                                    }
+                                }.startQuery(0, null, Utils.parseUri(Constants.ITEMS), null, Utils.queryByKey(QUESTION_ID, ids[which]), null, null);
+                            }
+                        })
 						.setIcon(R.drawable.ic_launcher)
 						.setTitle(R.string.search_found)
 						.setNeutralButton(android.R.string.ok, null)

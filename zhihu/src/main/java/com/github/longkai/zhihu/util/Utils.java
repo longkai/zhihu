@@ -137,6 +137,13 @@ public class Utils {
                 + page + "?r=" + System.currentTimeMillis();
     }
 
+    /**
+     * 刷新的web数据接口
+     */
+    public static String refreshUrl() {
+        return url(1);
+    }
+
 	public static void createTables(SQLiteDatabase db) {
         StringBuilder sql = new StringBuilder();
         // 阅读项目数据表
@@ -189,8 +196,18 @@ public class Utils {
      * @param id
      * @return _id=xx
      */
-    public static final String queryById(String id) {
-        return BaseColumns._ID + "=" + id;
+    public static String queryById(String id) {
+        return queryByKey(BaseColumns._ID, id);
+    }
+
+    /**
+     * 通过key=value来查询
+     * @param key
+     * @param value
+     * @return key=value
+     */
+    public static String queryByKey(String key, Object value) {
+        return key + "=" + value;
     }
 
     /**

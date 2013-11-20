@@ -27,6 +27,8 @@ import com.github.longkai.zhihu.ZhihuApp;
 import com.github.longkai.zhihu.util.Constants;
 import com.github.longkai.zhihu.util.Utils;
 
+import static com.github.longkai.zhihu.util.Constants.*;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -56,20 +58,20 @@ public class UsersFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Cursor cursor = mAdapter.getCursor();
-		String account = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
+		String uid = cursor.getString(cursor.getColumnIndex(UID));
 		// go to zhihu.com
-		Utils.viewUserInfo(getActivity(), account);
+		Utils.viewUserInfo(getActivity(), uid);
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Uri uri = Constants.parseUri(Constants.USERS);
-		return new CursorLoader(getActivity(), uri, null, null, null, null);
-	}
+        Uri uri = Utils.parseUri(ITEMS);
+        return new CursorLoader(getActivity(), uri, USER_PROJECTION, null, null, DESC_ORDER);
+    }
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		mAdapter.swapCursor(data);
+        mAdapter.changeCursor(data);
 		if (isResumed()) {
 			setListShown(true);
 		} else {
@@ -79,7 +81,7 @@ public class UsersFragment extends ListFragment implements LoaderManager.LoaderC
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		mAdapter.swapCursor(null);
+		mAdapter.changeCursor(null);
 	}
 
 	/**
@@ -88,7 +90,7 @@ public class UsersFragment extends ListFragment implements LoaderManager.LoaderC
 	private static class UsersAdapter extends CursorAdapter {
 
 		public UsersAdapter(Context context) {
-			super(context, null, 9);
+			super(context, null, 0);
 		}
 
 		@Override
@@ -96,11 +98,11 @@ public class UsersFragment extends ListFragment implements LoaderManager.LoaderC
 			View view = LayoutInflater.from(context).inflate(R.layout.user_row, null);
 			ViewHolder holder = new ViewHolder();
 			holder.avatar = (ImageView) view.findViewById(R.id.avatar);
-			holder.avatarIndex = cursor.getColumnIndex("avatar");
+			holder.avatarIndex = cursor.getColumnIndex(AVATAR);
 			holder.nick = (TextView) view.findViewById(R.id.nick);
-			holder.nickIndex = cursor.getColumnIndex("nick");
+			holder.nickIndex = cursor.getColumnIndex(NICK);
 			holder.status = (TextView) view.findViewById(R.id.status);
-			holder.statusIndex = cursor.getColumnIndex("status");
+			holder.statusIndex = cursor.getColumnIndex(STATUS);
 
 			view.setTag(holder);
 			return view;

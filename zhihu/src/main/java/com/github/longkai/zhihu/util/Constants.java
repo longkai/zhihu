@@ -75,4 +75,10 @@ public class Constants {
     /** 封面 */
     public static final String TOPIC_AVATAR = "avatar";
 
+    /** 使用android默认的_id标识降序 */
+    public static final String DESC_ORDER = BaseColumns._ID + " DESC";
+
+    /** 回答者的查询列 */
+    public static final String[] USER_PROJECTION = {BaseColumns._ID, UID, NICK, STATUS, AVATAR};
+
 }

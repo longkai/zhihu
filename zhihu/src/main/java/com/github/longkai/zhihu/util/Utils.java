@@ -140,8 +140,9 @@ public class Utils {
 	public static void createTables(SQLiteDatabase db) {
         StringBuilder sql = new StringBuilder();
         // 阅读项目数据表
+        // _id 仅做为本地的一个标识与列表顺序比较的时间戳，实际的主键还是答案的id
         sql.append("CREATE TABLE ").append(ITEMS).append("(")
-                .append(BaseColumns._ID).append(" int PRIMARY KEY,")
+                .append(BaseColumns._ID).append(" int,")
                 .append(QUESTION_ID).append(" int NOT NULL,")
                 .append(TITLE).append(" text NOT NULL")
                 .append(DESCRIPTION).append(" text,")
@@ -152,7 +153,7 @@ public class Utils {
 
                 .append(ANSWER_ID).append(" int,")
                 .append(ANSWER).append(" text,")
-                .append(VOTE).append(" int,")
+                .append(VOTE).append(" int PRIMARY KEY,")
                 .append(LAST_ALTER_DATE).append(" int,")
                 .append(VOTERS).append(" text,")
 
@@ -208,11 +209,17 @@ public class Utils {
         JSONArray question;
         JSONArray _topics;
         JSONArray _topic;
-        // 存储某个项目所属于的话题的id值，依照这样的格式：123,321,456
+        // 存储某个项目所属于的话题的id值，依照这样的格式(末尾有个多余的逗号，
+        // 不去也恰好方便查询用= =)：123,321,456,
         StringBuilder topicIds = new StringBuilder();
+        // 用当前时间戳来作为item在本地的标识与排序，降序，时间戳越大代表越新
+        long millis = System.currentTimeMillis();
+
         for (int i = 0; i < items.length; i++) {
             array = jsonArray.optJSONArray(i);
             item = new ContentValues();
+
+            item.put(BaseColumns._ID, millis--);
 
             // 答案相关
             item.put(STATUS, array.optString(1));
@@ -250,7 +257,8 @@ public class Utils {
                     topic.put(TOPIC_DESCRIPTION, _topic.optString(2));
                     topic.put(TOPIC_AVATAR, _topic.optString(3));
                     topic.put(TOPIC_ID, _topic.optLong(4));
-                    // todo 可能会有重复，但是存进数据库的话会replace主键相同的值，考虑要不要在这里去掉重复的话题再插入数据库
+                    // todo 可能会有重复，但是存进数据库的话会replace主键相同的值，
+                    // 考虑要不要在这里去掉重复的话题再插入数据库
                     topics.add(topic);
 
                     // 处理本item所属的话题

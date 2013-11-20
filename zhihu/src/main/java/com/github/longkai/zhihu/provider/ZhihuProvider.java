@@ -13,8 +13,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.util.Log;
+
 import com.github.longkai.zhihu.R;
 import com.github.longkai.zhihu.util.Constants;
 import com.github.longkai.zhihu.util.Utils;
@@ -37,34 +37,24 @@ public class ZhihuProvider extends ContentProvider {
 
 	private static final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-	public static final int USERS = 0;
-	public static final int USER = 1;
-	public static final int ANSWERS = 2;
-	public static final int ANSWER = 3;
-	public static final int QUESTIONS = 4;
-	public static final int QUESTION = 5;
-	public static final int TOPICS = 6;
-	public static final int TOPIC = 7;
-	public static final int VOTERS = 8; // array, no single
+    /** 阅读条目列表 */
+    private static final int ITEMS = 0;
+    /** 单个阅读条目 */
+    private static final int ITEM = 1;
+    /** 话题列表 */
+    private static final int TOPICS = 2;
 
-	public static final int DELETE = 9;
+    /** 清除缓存 */
+    private static final int CLEAR = -1;
 
 	static {
-		matcher.addURI(AUTHORITY, Constants.USERS, USERS);
-		matcher.addURI(AUTHORITY, Constants.USERS + "/#", USER);
-
-		matcher.addURI(AUTHORITY, Constants.ANSWERS, ANSWERS);
-		matcher.addURI(AUTHORITY, Constants.ANSWERS + "/#", ANSWER);
-
-		matcher.addURI(AUTHORITY, Constants.QUESTIONS, QUESTIONS);
-		matcher.addURI(AUTHORITY, Constants.QUESTIONS + "/#", QUESTION);
+		matcher.addURI(AUTHORITY, Constants.ITEMS, ITEMS);
+		matcher.addURI(AUTHORITY, Constants.ITEMS + "/#", ITEM);
 
 		matcher.addURI(AUTHORITY, Constants.TOPICS, TOPICS);
-		matcher.addURI(AUTHORITY, Constants.TOPICS + "/#", TOPIC);
 
-		matcher.addURI(AUTHORITY, Constants.VOTERS, VOTERS);
-		matcher.addURI(AUTHORITY, Constants.DELETE, DELETE);
-	}
+        matcher.addURI(AUTHORITY, Constants.CLEAR_CACHE, CLEAR);
+    }
 
 	private ZhihuData mData;
 
@@ -74,43 +64,44 @@ public class ZhihuProvider extends ContentProvider {
 		return true;
 	}
 
+    @Override
+    public String getType(Uri uri) {
+        String type;
+        switch (matcher.match(uri)) {
+            case ITEMS:
+                type = MULTIPLE_RECORDS_MIME_TYPE + Constants.ITEMS;
+                break;
+            case ITEM:
+                type = SINGLE_RECORD_MIME_TYPE + Constants.ITEM;
+                break;
+            case TOPICS:
+                type = MULTIPLE_RECORDS_MIME_TYPE + Constants.TOPICS;
+                break;
+            case CLEAR:
+                type = null;
+                break;
+            default:
+                type = null;
+        }
+        return type;
+    }
+
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		SQLiteDatabase db = mData.getReadableDatabase();
 		Cursor cursor;
 		switch (matcher.match(uri)) {
-			case USERS:
-				cursor = db.query(Constants.USERS, projection, selection, selectionArgs, null, null, sortOrder);
-				break;
-			case USER:
-				selection = BaseColumns._ID + "='" + uri.getLastPathSegment() + "'";
-				cursor = db.query(Constants.USERS, projection, selection, null, null, null, null);
-				break;
-			case ANSWERS:
-				cursor = db.query(Constants.ANSWERS, projection, selection, selectionArgs, null, null, sortOrder);
-				break;
-			case ANSWER:
-				selection = BaseColumns._ID + "=" + uri.getLastPathSegment();
-				cursor = db.query(Constants.ANSWERS, projection, selection, null, null, null, null);
-				break;
-			case QUESTIONS:
-				cursor = db.query(Constants.QUESTIONS, projection, selection, selectionArgs, null, null, sortOrder);
-				break;
-			case QUESTION:
-				selection = BaseColumns._ID + "=" + uri.getLastPathSegment();
-				cursor = db.query(Constants.QUESTIONS, projection, selection, null, null, null, null);
-				break;
-			case TOPICS:
-				cursor = db.query(Constants.TOPICS, projection, selection, selectionArgs, null, null, sortOrder);
-				break;
-			case TOPIC:
-				selection = BaseColumns._ID + "=" + uri.getLastPathSegment();
-				cursor = db.query(Constants.TOPICS, projection, selection, null, null, null, null);
-				break;
-			case VOTERS:
-				cursor = db.query(Constants.VOTERS, projection, selection, selectionArgs, null, null, sortOrder);
-				break;
-			default:
+            case ITEMS:
+                cursor = db.query(Constants.ITEMS, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case ITEM:
+                selection = Utils.queryById(uri.getLastPathSegment());
+                cursor = db.query(Constants.ITEMS, projection, selection, selectionArgs, null, null, null);
+                break;
+            case TOPICS:
+                cursor = db.query(Constants.TOPICS, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            default:
 				throw new RuntimeException("not found for the uri: " + uri);
 		}
 
@@ -119,62 +110,16 @@ public class ZhihuProvider extends ContentProvider {
 	}
 
 	@Override
-	public String getType(Uri uri) {
-		String type;
-		switch (matcher.match(uri)) {
-			case USER:
-				type = SINGLE_RECORD_MIME_TYPE + Constants.USERS;
-				break;
-			case USERS:
-				type = MULTIPLE_RECORDS_MIME_TYPE + Constants.USERS;
-				break;
-			case ANSWER:
-				type = SINGLE_RECORD_MIME_TYPE + Constants.ANSWERS;
-				break;
-			case ANSWERS:
-				type = MULTIPLE_RECORDS_MIME_TYPE + Constants.ANSWERS;
-				break;
-			case QUESTION:
-				type = SINGLE_RECORD_MIME_TYPE + Constants.QUESTIONS;
-				break;
-			case QUESTIONS:
-				type = MULTIPLE_RECORDS_MIME_TYPE + Constants.QUESTIONS;
-				break;
-			case TOPIC:
-				type = SINGLE_RECORD_MIME_TYPE + Constants.TOPICS;
-				break;
-			case TOPICS:
-				type = MULTIPLE_RECORDS_MIME_TYPE + Constants.TOPICS;
-				break;
-			case VOTERS:
-				type = MULTIPLE_RECORDS_MIME_TYPE + Constants.VOTERS;
-				break;
-			default:
-				throw new RuntimeException("not found for the uri: " + uri);
-		}
-		return type;
-	}
-
-	@Override
 	public int bulkInsert(Uri uri, ContentValues[] values) {
 		String table;
 		switch (matcher.match(uri)) {
-			case USERS:
-				table = Constants.USERS;
-				break;
-			case ANSWERS:
-				table = Constants.ANSWERS;
-				break;
-			case QUESTIONS:
-				table = Constants.QUESTIONS;
-				break;
-			case TOPICS:
-				table = Constants.TOPICS;
-				break;
-			case VOTERS:
-				table = Constants.VOTERS;
-				break;
-			default:
+            case ITEMS:
+                table = Constants.ITEMS;
+                break;
+            case TOPICS:
+                table = Constants.TOPICS;
+                break;
+            default:
 				throw new RuntimeException("not found for the uri: " + uri);
 		}
 		SQLiteDatabase db = mData.getWritableDatabase();
@@ -200,9 +145,9 @@ public class ZhihuProvider extends ContentProvider {
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		SQLiteDatabase db = mData.getWritableDatabase();
 		switch (matcher.match(uri)) {
-			case DELETE:
-				Utils.dropTables(getContext(), db);
-				Utils.createTables(getContext(), db);
+			case CLEAR:
+				Utils.dropTables(db);
+				Utils.createTables(db);
 				break;
 			default:
 				throw new UnsupportedOperationException("UnsupportedOperationException");
@@ -226,14 +171,14 @@ public class ZhihuProvider extends ContentProvider {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			Log.d(TAG, "begin creating tables...");
-			Utils.createTables(getContext(), db);
+			Utils.createTables(db);
 			Log.d(TAG, "end creating tables...");
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.d(TAG, "drop all tables...");
-			Utils.dropTables(getContext(), db);
+			Utils.dropTables(db);
 
 			Log.d(TAG, "recreate tables...");
 			onCreate(db);

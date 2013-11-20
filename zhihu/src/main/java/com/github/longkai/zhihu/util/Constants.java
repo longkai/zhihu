@@ -5,8 +5,7 @@
  */
 package com.github.longkai.zhihu.util;
 
-import android.net.Uri;
-import com.github.longkai.zhihu.provider.ZhihuProvider;
+import android.provider.BaseColumns;
 
 /**
  * 常量值
@@ -17,29 +16,63 @@ import com.github.longkai.zhihu.provider.ZhihuProvider;
  */
 public class Constants {
 
-	public static final String USERS = "users";
-	public static final String ANSWERS = "answers";
-	public static final String QUESTIONS = "questions";
-	public static final String TOPICS = "topics";
-	public static final String VOTERS = "voters";
-	public static final String QUESTION_TOPICS = "question_topics";
+    public static final String DATA = "data";
 
-	public static final String DELETE = "delete";
+    /** 清除缓存 */
+    public static final String CLEAR_CACHE = "clear_cache";
 
-	public static final String DATA = "data";
+    /** 阅读条目们 */
+    public static final String ITEMS = "items";
 
-	public static Uri parseUri(String path) {
-		return Uri.parse(ZhihuProvider.BASE_URI + path);
-	}
+    /** 一个条目 */
+    public static final String ITEM = "item";
 
-	/**
-	 * page == 1 表示第一页，最新的那页
-	 * @param page
-	 * @return
-	 */
-	public static String url(int page) {
-		return "http://www.zhihu.com/reader/json/"
-				+ page + "?r=" + System.currentTimeMillis();
-	}
+    // 问题相关
+    /** id */
+    public static final String QUESTION_ID = "question_id";
+    /** 标题 */
+    public static final String TITLE = "title";
+    /** 描述 */
+    public static final String DESCRIPTION = "description";
+    /** 关注次数 */
+    public static final String STARRED = "starred";
+    /** 回答次数 */
+    public static final String ANSWERED = "answered";
+    /** 浏览次数 */
+    public static final String VIEWED = "viewed";
+    /** 所属话题 */
+    public static final String TOPICS = "topics";
+
+    // 回答相关
+    /** id */
+    public static final String ANSWER_ID = "answer_id";
+    /** 回答内容 */
+    public static final String ANSWER = "answer";
+    /** 答案获得投票数 */
+    public static final String VOTE = "vote";
+    /** 答案最后更新时间戳(需要*1000) */
+    public static final String LAST_ALTER_DATE = "last_alter_date";
+    /** 赞同此回答的用户列表 */
+    public static final String VOTERS = "voters";
+
+    // 回答者相关
+    /** id */
+    public static final String UID = "uid";
+    /** 昵称 */
+    public static final String NICK = "nick";
+    /** 个性描述 */
+    public static final String STATUS = "status";
+    /** 头像 */
+    public static final String AVATAR = "avatar";
+
+    // 话题相关，这里需要用另一个表
+    /** id */
+    public static final String TOPIC_ID = BaseColumns._ID;
+    /** 名字 */
+    public static final String TOPIC_NAME = "name";
+    /** 介绍 */
+    public static final String TOPIC_DESCRIPTION = "description";
+    /** 封面 */
+    public static final String TOPIC_AVATAR = "avatar";
 
 }

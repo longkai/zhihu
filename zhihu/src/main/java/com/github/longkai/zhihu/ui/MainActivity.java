@@ -137,7 +137,7 @@ public class MainActivity extends ActionBarActivity implements
 					    Intent intent = new Intent(MainActivity.this, FetchService.class);
 					    intent.putExtra(DATA, response);
 					    Toast.makeText(MainActivity.this, R.string.loading_data, Toast.LENGTH_SHORT).show();
-						MainActivity.this.startService(intent);
+					    MainActivity.this.startService(intent);
 				    }
 			    }, new Response.ErrorListener() {
 				    @Override

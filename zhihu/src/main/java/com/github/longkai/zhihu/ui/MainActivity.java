@@ -204,62 +204,57 @@ public class MainActivity extends ActionBarActivity implements
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		String keywords1 = "," + id;
-		String keywords2 = id + ",";
-		String selection = "topics like '%" + keywords1 + "%' or topics like '%" + keywords2 + "%'";
+        String selection = "topics like " + Utils.like(id + "");
 
-		// 这里写的复杂了= =
-		new AsyncQueryHandler(getContentResolver()) {
-			@Override
-			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				// 标题和相关的id对应上
-				String[] titles = new String[cursor.getCount()];
-				final long[] ids = new long[titles.length];
-				int i = 0;
-				while (cursor.moveToNext()) {
-					titles[i] = cursor.getString(cursor.getColumnIndex("title"));
-					ids[i] = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
-					i++;
-				}
-				// 弹出的对话框中包含我们查询到的结果
-				new AlertDialog.Builder(MainActivity.this)
-						.setItems(titles, new DialogInterface.OnClickListener() {
-							// 处理在对话框的列表项目的点击事件
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-                                new AsyncQueryHandler(getContentResolver()) {
-                                    @Override
-                                    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                                        Utils.viewAnswer(MainActivity.this, cursor);
-                                    }
-                                }.startQuery(0, null, Utils.parseUri(Constants.ITEMS), null, Utils.queryByKey(QUESTION_ID, ids[which]), null, null);
+        // 这里写的复杂了= =
+        new AsyncQueryHandler(getContentResolver()) {
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                // 标题和相关的id对应上
+                String[] titles = new String[cursor.getCount()];
+                final long[] ids = new long[titles.length];
+                int i = 0;
+                while (cursor.moveToNext()) {
+                    titles[i] = cursor.getString(cursor.getColumnIndex(TITLE));
+                    ids[i] = cursor.getLong(cursor.getColumnIndex(ANSWER_ID));
+                    i++;
+                }
+                // 弹出的对话框中包含我们查询到的结果
+                new AlertDialog.Builder(MainActivity.this)
+                        .setItems(titles, new DialogInterface.OnClickListener() {
+                            // 处理在对话框的列表项目的点击事件
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(MainActivity.this, AnswerActivity.class);
+                                intent.putExtra(ANSWER_ID, ids[which]);
+                                startActivity(intent);
                             }
                         })
-						.setIcon(R.drawable.ic_launcher)
-						.setTitle(R.string.search_found)
-						.setNeutralButton(android.R.string.ok, null)
-						.show();
-			}
-		}.startQuery(0, null, parseUri(QUESTIONS),
-				new String[]{BaseColumns._ID, "title"}, selection, null, null);
+                        .setIcon(R.drawable.ic_launcher)
+                        .setTitle(R.string.search_found)
+                        .setNeutralButton(android.R.string.ok, null)
+                        .show();
+            }
+        }.startQuery(0, null, Utils.parseUri(ITEMS),
+                ITEMS_PROJECTION, selection, null, DESC_ORDER);
 
 //		todo bug here fc =.=
 //		mDrawerLayout.closeDrawer(mDrawer);
-	}
+    }
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		return new CursorLoader(this, parseUri(TOPICS), null, null, null, null);
+		return new CursorLoader(this, Utils.parseUri(TOPICS), null, null, null, DESC_ORDER);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		mAdapter.swapCursor(data);
+		mAdapter.changeCursor(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		mAdapter.swapCursor(null);
+		mAdapter.changeCursor(null);
 	}
 
 	/**
@@ -340,11 +335,11 @@ public class MainActivity extends ActionBarActivity implements
 			View view = LayoutInflater.from(context).inflate(R.layout.user_row, null);
 			ViewHolder holder = new ViewHolder();
 			holder.avatar = (ImageView) view.findViewById(R.id.avatar);
-			holder.avatarIndex = cursor.getColumnIndex("avatar");
+			holder.avatarIndex = cursor.getColumnIndex(TOPIC_AVATAR);
 			holder.name = (TextView) view.findViewById(R.id.nick);
-			holder.nameIndex = cursor.getColumnIndex("name");
+			holder.nameIndex = cursor.getColumnIndex(TOPIC_NAME);
 			holder.desc = (TextView) view.findViewById(R.id.status);
-			holder.descIndex = cursor.getColumnIndex("description");
+			holder.descIndex = cursor.getColumnIndex(TOPIC_DESCRIPTION);
 
 			view.setTag(holder);
 			return view;

@@ -121,7 +121,7 @@ public class Utils {
      * @return '%str%'
      */
     public static String like(String str) {
-        return "'%" + str + "'%";
+        return "'%" + str + "%'";
     }
 
 	public static void createTables(SQLiteDatabase db) {

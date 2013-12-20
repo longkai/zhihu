@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.app.*;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -40,7 +41,7 @@ public class MainActivity extends ActionBarActivity implements
 
 	public static final String TAG = "MainActivity";
 
-    private ViewPager mViewPager;
+	private ViewPager mViewPager;
 
 	// 抽屉相关
 	private CursorAdapter mAdapter;
@@ -49,49 +50,49 @@ public class MainActivity extends ActionBarActivity implements
 	private ActionBarDrawerToggle mDrawerToggle;
 	private ActionBarDrawerHelper mActionBar;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
 
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		final ActionBar actionBar = getSupportActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-	    String[] titles = getResources().getStringArray(R.array.pager_titles);
-	    mViewPager.setAdapter(new ZhihuPagerAdapter(getSupportFragmentManager(), titles));
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		String[] titles = getResources().getStringArray(R.array.pager_titles);
+		mViewPager.setAdapter(new ZhihuPagerAdapter(getSupportFragmentManager(), titles));
 
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
+		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+				actionBar.setSelectedNavigationItem(position);
+			}
+		});
 
-	    // tab titles
-	    for (int i = 0; i < titles.length; i++) {
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(titles[i])
-                            .setTabListener(this));
-        }
+		// tab titles
+		for (int i = 0; i < titles.length; i++) {
+			actionBar.addTab(
+					actionBar.newTab()
+							.setText(titles[i])
+							.setTabListener(this));
+		}
 
-	    // drawer
-	    mDrawer = (ListView) findViewById(R.id.left_drawer);
-	    mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-	    mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-			    R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
-	    mDrawerLayout.setDrawerListener(this);
+		// drawer
+		mDrawer = (ListView) findViewById(R.id.left_drawer);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+				R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
+		mDrawerLayout.setDrawerListener(this);
 
-	    mActionBar = new ActionBarCompatDrwaerHelper(getSupportActionBar());
-	    mActionBar.init();
+		mActionBar = new ActionBarCompatDrwaerHelper(getSupportActionBar());
+		mActionBar.init();
 
 
-	    mAdapter = new TopicsAdapter(this);
-	    mDrawer.setAdapter(mAdapter);
-	   	mDrawer.setOnItemClickListener(this);
-	    getSupportLoaderManager().initLoader(0, null, this);
-    }
+		mAdapter = new TopicsAdapter(this);
+		mDrawer.setAdapter(mAdapter);
+		mDrawer.setOnItemClickListener(this);
+		getSupportLoaderManager().initLoader(0, null, this);
+	}
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
@@ -105,36 +106,36 @@ public class MainActivity extends ActionBarActivity implements
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-	    getMenuInflater().inflate(R.menu.main, menu);
-	    return true;
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-	    if (item != null && item.getItemId() == android.R.id.home && mDrawerToggle.isDrawerIndicatorEnabled()) {
-		    if (mDrawerLayout.isDrawerVisible(GravityCompat.START)) {
-			    mDrawerLayout.closeDrawer(GravityCompat.START);
-		    } else {
-			    mDrawerLayout.openDrawer(GravityCompat.START);
-		    }
-		    return true;
-	    }
-	    switch (item.getItemId()) {
-		    case R.id.action_quit: // 退出，实际上是返回的桌面
-			    // fake, go back to home = =
-			    Intent i = new Intent(Intent.ACTION_MAIN);
-			    i.addCategory(Intent.CATEGORY_HOME);
-			    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			    startActivity(i);
-			    break;
-		    case R.id.refresh: // 抓取新的数据并缓存到本地
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item != null && item.getItemId() == android.R.id.home && mDrawerToggle.isDrawerIndicatorEnabled()) {
+			if (mDrawerLayout.isDrawerVisible(GravityCompat.START)) {
+				mDrawerLayout.closeDrawer(GravityCompat.START);
+			} else {
+				mDrawerLayout.openDrawer(GravityCompat.START);
+			}
+			return true;
+		}
+		switch (item.getItemId()) {
+			case R.id.action_quit: // 退出，实际上是返回的桌面
+				// fake, go back to home = =
+				Intent i = new Intent(Intent.ACTION_MAIN);
+				i.addCategory(Intent.CATEGORY_HOME);
+				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(i);
+				break;
+			case R.id.refresh: // 抓取新的数据并缓存到本地
 				Toast.makeText(this, R.string.loading_data, Toast.LENGTH_LONG).show();
 				Intent intent = new Intent(this, FetchService.class);
 				startService(intent);
 				break;
-		    case R.id.delete:
+			case R.id.delete:
 //			    new AsyncQueryHandler(getContentResolver()) {
 //				    @Override
 //				    protected void onDeleteComplete(int token, Object cookie, int result) {
@@ -142,27 +143,27 @@ public class MainActivity extends ActionBarActivity implements
 //				    }
 //			    }.startDelete(0, null, Constants.parseUri(Constants.DELETE), null, null);
 //              todo 直接删除再重建居然有问题。。。
-			    Toast.makeText(this, getString(R.string.not_yet_impl), Toast.LENGTH_SHORT).show();
-			    break;
-		    default:
-			    Log.e(TAG, "no this option!");
-			    break;
-	    }
-	    return super.onOptionsItemSelected(item);
-    }
+				Toast.makeText(this, getString(R.string.not_yet_impl), Toast.LENGTH_SHORT).show();
+				break;
+			default:
+				Log.e(TAG, "no this option!");
+				break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
+	@Override
+	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+		mViewPager.setCurrentItem(tab.getPosition());
+	}
 
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
+	@Override
+	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+	}
 
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
+	@Override
+	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+	}
 
 	@Override
 	public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -188,43 +189,43 @@ public class MainActivity extends ActionBarActivity implements
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String selection = "topics like " + Utils.like(id + "");
+		String selection = "topics like " + Utils.like(id + "");
 
-        // 这里写的复杂了= =
-        new AsyncQueryHandler(getContentResolver()) {
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                // 标题和相关的id对应上
-                String[] titles = new String[cursor.getCount()];
-                final long[] ids = new long[titles.length];
-                int i = 0;
-                while (cursor.moveToNext()) {
-                    titles[i] = cursor.getString(cursor.getColumnIndex(TITLE));
-                    ids[i] = cursor.getLong(cursor.getColumnIndex(ANSWER_ID));
-                    i++;
-                }
-                // 弹出的对话框中包含我们查询到的结果
-                new AlertDialog.Builder(MainActivity.this)
-                        .setItems(titles, new DialogInterface.OnClickListener() {
-                            // 处理在对话框的列表项目的点击事件
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(MainActivity.this, AnswerActivity.class);
-                                intent.putExtra(ANSWER_ID, ids[which]);
-                                startActivity(intent);
-                            }
-                        })
-                        .setIcon(R.drawable.ic_launcher)
-                        .setTitle(R.string.search_found)
-                        .setNeutralButton(android.R.string.ok, null)
-                        .show();
-            }
-        }.startQuery(0, null, Utils.parseUri(ITEMS),
-                ITEMS_PROJECTION, selection, null, DESC_ORDER);
+		// 这里写的复杂了= =
+		new AsyncQueryHandler(getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				// 标题和相关的id对应上
+				String[] titles = new String[cursor.getCount()];
+				final long[] ids = new long[titles.length];
+				int i = 0;
+				while (cursor.moveToNext()) {
+					titles[i] = cursor.getString(cursor.getColumnIndex(TITLE));
+					ids[i] = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+					i++;
+				}
+				// 弹出的对话框中包含我们查询到的结果
+				new AlertDialog.Builder(MainActivity.this)
+						.setItems(titles, new DialogInterface.OnClickListener() {
+							// 处理在对话框的列表项目的点击事件
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								Intent intent = new Intent(MainActivity.this, AnswerActivity.class);
+								intent.putExtra(ANSWER_ID, ids[which]);
+								startActivity(intent);
+							}
+						})
+						.setIcon(R.drawable.ic_launcher)
+						.setTitle(R.string.search_found)
+						.setNeutralButton(android.R.string.ok, null)
+						.show();
+			}
+		}.startQuery(0, null, Utils.parseUri(ITEMS),
+				ITEMS_PROJECTION, selection, null, DESC_ORDER);
 
 //		todo bug here fc =.=
 //		mDrawerLayout.closeDrawer(mDrawer);
-    }
+	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {

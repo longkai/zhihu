@@ -53,35 +53,50 @@ import static com.github.longkai.zhihu.util.Constants.UID;
  */
 public class AnswerActivity extends ActionBarActivity {
 
-    /** 问题id */
-    private long qid;
-    /** 本答案id */
-    private long id;
-    /** 问题的标题，用于分享 */
-    private String questionTitle;
-    /** 答案摘要 */
-    private String answerDigest;
-    /** 答主id */
-    private String uid;
+	/**
+	 * 问题id
+	 */
+	private long qid;
+	/**
+	 * 答案在server的id标识
+	 */
+	private long aid;
+	/**
+	 * 本答案在本地排序id
+	 */
+	private long id;
+	/**
+	 * 问题的标题，用于分享
+	 */
+	private String questionTitle;
+	/**
+	 * 答案摘要
+	 */
+	private String answerDigest;
+	/**
+	 * 答主id
+	 */
+	private String uid;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.answer);
 
-        final TextView title = (TextView) findViewById(android.R.id.title);
-        final WebView desc = (WebView) findViewById(R.id.description);
-        final TextView nick = (TextView) findViewById(R.id.nick);
-        final ImageView avatar = (ImageView) findViewById(R.id.avatar);
-        final TextView status = (TextView) findViewById(R.id.status);
-        final WebView answer = (WebView) findViewById(R.id.content);
-        final TextView last_alter_date = (TextView) findViewById(R.id.last_alter_date);
+		final TextView title = (TextView) findViewById(android.R.id.title);
+		final WebView desc = (WebView) findViewById(R.id.description);
+		final TextView nick = (TextView) findViewById(R.id.nick);
+		final ImageView avatar = (ImageView) findViewById(R.id.avatar);
+		final TextView status = (TextView) findViewById(R.id.status);
+		final WebView answer = (WebView) findViewById(R.id.content);
+		final TextView last_alter_date = (TextView) findViewById(R.id.last_alter_date);
 
-        id = getIntent().getLongExtra(ANSWER_ID, 0);
+		id = getIntent().getLongExtra(ANSWER_ID, 0);
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor.moveToNext()) {
 					// 问题相关
+					aid = cursor.getLong(cursor.getColumnIndex(ANSWER_ID));
 					qid = cursor.getLong(cursor.getColumnIndex(QUESTION_ID));
 					questionTitle = cursor.getString(cursor.getColumnIndex(TITLE));
 					title.setText(questionTitle);
@@ -149,11 +164,12 @@ public class AnswerActivity extends ActionBarActivity {
 				Utils.viewUserInfo(this, uid);
 				break;
 			case R.id.view_at_web: // 去web上查看该答案
-                Utils.viewOnWeb(this, Uri.parse("http://www.zhihu.com/question/" + qid + "/answer/" + id));
-                break;
+				Utils.viewOnWeb(this, Uri.parse("http://www.zhihu.com/question/" + qid +
+						"/answer/" + aid));
+				break;
 			case R.id.view_all:    // 在web上查看所有的答案
-                Utils.viewOnWeb(this, Uri.parse("http://www.zhihu.com/question/" + id));
-                break;
+				Utils.viewOnWeb(this, Uri.parse("http://www.zhihu.com/question/" + qid));
+				break;
 			default:
 				throw new RuntimeException("no this option!");
 		}

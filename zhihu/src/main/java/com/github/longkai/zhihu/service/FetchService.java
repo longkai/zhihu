@@ -56,6 +56,7 @@ public class FetchService extends IntentService {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				Log.wtf(TAG, "error " + error.toString());
+				notification(getResources().getString(R.string.load_data_error, error.toString()));
 			}
 		}
 		));

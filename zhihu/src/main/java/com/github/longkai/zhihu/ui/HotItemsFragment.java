@@ -20,6 +20,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SearchViewCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.*;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -53,10 +54,19 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
 
 	private static final int COUNT = 5; // 每次加载的步长为5个
 
+	private static long MIN_ITEM_INDEX;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAdapter = new AnswersAdaper(getActivity());
+
+		Cursor query = getActivity().getContentResolver().query(Utils.parseUri(Constants.ITEMS),
+				new String[]{"MIN(_id)"}, null, null, null);
+		if (query != null && query.moveToNext()) {
+			MIN_ITEM_INDEX = query.getLong(0);
+			query.close();
+		}
 	}
 
 	@Override
@@ -164,9 +174,8 @@ public class HotItemsFragment extends ListFragment implements LoaderManager.Load
                     // todo 这个按钮有bug
 					// 如果到了最后一个，那么这个button就不能按了，
 					// 这里，简单的已id值为最小的作为最后一个，实际上顺序不是这样的= =
-					long l1 = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
-					long l2 = ZhihuApp.getApp().getPreferences().getLong(BaseColumns._ID, 0);
-					if (l1 == l2) {
+					long index = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+					if (index == MIN_ITEM_INDEX) {
 						loadMore.setText(getString(R.string.no_more));
 						loadMore.setClickable(false);
 					}

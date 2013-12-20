@@ -6,6 +6,7 @@
 package com.github.longkai.zhihu;
 
 import android.app.Application;
+import android.content.AsyncQueryHandler;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,6 +20,7 @@ import com.android.volley.toolbox.Volley;
 import com.github.longkai.zhihu.util.BitmapLruCache;
 
 import static com.github.longkai.zhihu.util.Constants.ITEM;
+import static com.github.longkai.zhihu.util.Constants.ITEMS;
 
 /**
  * 知乎阅读应用程序对象.
@@ -46,14 +48,6 @@ public class ZhihuApp extends Application implements SharedPreferences.OnSharedP
 		// todo makes the cache' s size available
 		sLoader = new ImageLoader(sQueue, new BitmapLruCache(100)); // 100 cache entries
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-		// check the last id of the question...
-//		Cursor query = getContentResolver().query(Uri.parse(ITEM),
-//                new String[]{"MIN(_id)"}, null, null, null);
-//        if (query != null && query.moveToNext()) {
-//            mPreferences.edit().putLong(BaseColumns._ID, query.getLong(0)).commit();
-//            query.close();
-//        }
     }
 
 	public static ZhihuApp getApp() {

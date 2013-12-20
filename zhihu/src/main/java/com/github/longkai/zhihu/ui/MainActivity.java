@@ -130,6 +130,7 @@ public class MainActivity extends ActionBarActivity implements
 			    startActivity(i);
 			    break;
 		    case R.id.refresh: // 抓取新的数据并缓存到本地
+				Toast.makeText(this, R.string.loading_data, Toast.LENGTH_LONG).show();
 				Intent intent = new Intent(this, FetchService.class);
 				startService(intent);
 				break;

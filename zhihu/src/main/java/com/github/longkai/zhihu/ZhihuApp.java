@@ -8,16 +8,17 @@ package com.github.longkai.zhihu;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.util.Log;
+
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.github.longkai.zhihu.util.BitmapLruCache;
 
-import static com.github.longkai.zhihu.util.Constants.QUESTIONS;
-import static com.github.longkai.zhihu.util.Constants.parseUri;
+import static com.github.longkai.zhihu.util.Constants.ITEM;
 
 /**
  * 知乎阅读应用程序对象.
@@ -47,12 +48,13 @@ public class ZhihuApp extends Application implements SharedPreferences.OnSharedP
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		// check the last id of the question...
-		Cursor query = getContentResolver().query(parseUri(QUESTIONS),
-				new String[]{"MIN(_id)"}, null, null, null);
-		if (query.moveToNext()) {
-			mPreferences.edit().putLong(BaseColumns._ID, query.getLong(0)).commit();
-		}
-	}
+//		Cursor query = getContentResolver().query(Uri.parse(ITEM),
+//                new String[]{"MIN(_id)"}, null, null, null);
+//        if (query != null && query.moveToNext()) {
+//            mPreferences.edit().putLong(BaseColumns._ID, query.getLong(0)).commit();
+//            query.close();
+//        }
+    }
 
 	public static ZhihuApp getApp() {
 		return sApp;

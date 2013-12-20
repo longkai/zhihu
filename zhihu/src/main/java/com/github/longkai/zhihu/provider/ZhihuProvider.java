@@ -45,7 +45,7 @@ public class ZhihuProvider extends ContentProvider {
     private static final int TOPICS = 2;
 
     /** 清除缓存 */
-    private static final int CLEAR = -1;
+    private static final int CLEAR = 10;
 
 	static {
 		matcher.addURI(AUTHORITY, Constants.ITEMS, ITEMS);

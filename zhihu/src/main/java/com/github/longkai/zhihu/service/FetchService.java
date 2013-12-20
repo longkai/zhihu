@@ -1,36 +1,31 @@
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 longkai(龙凯)
- * The software shall be used for good, not evil.
- */
 package com.github.longkai.zhihu.service;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.github.longkai.zhihu.R;
+import com.github.longkai.zhihu.ZhihuApp;
 import com.github.longkai.zhihu.ui.MainActivity;
-import com.github.longkai.zhihu.util.BeanUtils;
 import com.github.longkai.zhihu.util.Constants;
 import com.github.longkai.zhihu.util.Utils;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.Map;
 
 /**
- * 载入数据缓存到本地服务（非daemon）
- *
- * @User longkai
- * @Date 13-11-11
- * @Mail im.longkai@gmail.com
+ * Created by longkai on 13-12-21.
  */
 public class FetchService extends IntentService {
 
@@ -42,27 +37,28 @@ public class FetchService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		String data = intent.getExtras().getString(Constants.DATA);
-		JSONArray jsonArray;
-		try {
-			jsonArray = new JSONArray(data);
-		} catch (JSONException e) {
-			Log.wtf(TAG, "parsing json error!");
-			notification(getString(R.string.load_data_error));
-			return;
+		ZhihuApp.getRequestQueue().add(new JsonArrayRequest(Utils.refreshUrl(), new Response.Listener<JSONArray>() {
+			@Override
+			public void onResponse(JSONArray response) {
+				// 解析数据
+				Map<String, ContentValues[]> map = Utils.process(response);
+				ContentValues[] items = map.get(Constants.ITEMS);
+				ContentValues[] topics = map.get(Constants.TOPICS);
+
+				// 本地存储
+				getContentResolver().bulkInsert(Utils.parseUri(Constants.ITEMS), items);
+				getContentResolver().bulkInsert(Utils.parseUri(Constants.TOPICS), topics);
+
+				// 通知栏提醒用户数据已更新
+				notification(getString(R.string.done_fetch, response.length()));
+			}
+		}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Log.wtf(TAG, "error " + error.toString());
+			}
 		}
-
-        // 解析数据
-        Map<String, ContentValues[]> map = Utils.process(jsonArray);
-        ContentValues[] items = map.get(Constants.ITEMS);
-        ContentValues[] topics = map.get(Constants.TOPICS);
-
-        // 本地存储
-        getContentResolver().bulkInsert(Utils.parseUri(Constants.ITEMS), items);
-        getContentResolver().bulkInsert(Utils.parseUri(Constants.TOPICS), topics);
-
-        // 通知栏提醒用户数据已更新
-        notification(getString(R.string.done_fetch, jsonArray.length()));
+		));
 	}
 
 	// 在通知栏弹出一个通知
@@ -72,7 +68,7 @@ public class FetchService extends IntentService {
 				.setContentTitle(getString(R.string.app_name))
 				.setContentText(text)
 				.setAutoCancel(true)
-			.setTicker(text);
+				.setTicker(text);
 
 		Intent mainActivity = new Intent(this, MainActivity.class);
 		TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
